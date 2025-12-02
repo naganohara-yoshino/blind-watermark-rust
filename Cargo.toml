@@ -5,13 +5,14 @@ edition = "2024"
 
 [dependencies]
 anyhow = "1"
-ndarray = { version = "0.17" }
-rustfft = { version = "6" }
-ndrustfft = "0.6"
 faer = "0.23"
-faer-ext = {version = "0.7", features = ["ndarray"]}
+faer-ext = { version = "0.7", features = ["ndarray"] }
 yuv = "0.8"
 image = "0.25"
 
 [profile.dev.package.faer]
 opt-level = 3
+
+
+[dev-dependencies]
+approx = "0.5"

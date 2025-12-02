@@ -63,6 +63,7 @@ fn haar_idwt2(ll: MatRef<f64>, hl: MatRef<f64>, lh: MatRef<f64>, hh: MatRef<f64>
 #[cfg(test)]
 mod tests {
     use super::*;
+    use approx::assert_relative_eq;
     use faer::prelude::*;
 
     #[test]
@@ -83,10 +84,10 @@ mod tests {
 
         for r in 0..2 {
             for c in 0..2 {
-                assert!((ll[(r, c)] - expected_ll[(r, c)]).abs() < 1e-6);
-                assert!((hl[(r, c)] - expected_hl[(r, c)]).abs() < 1e-6);
-                assert!((lh[(r, c)] - expected_lh[(r, c)]).abs() < 1e-6);
-                assert!((hh[(r, c)] - expected_hh[(r, c)]).abs() < 1e-6);
+                assert_relative_eq!(ll[(r, c)], expected_ll[(r, c)], epsilon = 1e-6);
+                assert_relative_eq!(hl[(r, c)], expected_hl[(r, c)], epsilon = 1e-6);
+                assert_relative_eq!(lh[(r, c)], expected_lh[(r, c)], epsilon = 1e-6);
+                assert_relative_eq!(hh[(r, c)], expected_hh[(r, c)], epsilon = 1e-6);
             }
         }
     }
@@ -108,7 +109,7 @@ mod tests {
 
         for r in 0..4 {
             for c in 0..4 {
-                assert!((reconstructed[(r, c)] - expected[(r, c)]).abs() < 1e-6);
+                assert_relative_eq!(reconstructed[(r, c)], expected[(r, c)], epsilon = 1e-6);
             }
         }
     }
