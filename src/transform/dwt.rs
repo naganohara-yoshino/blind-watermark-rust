@@ -1,6 +1,46 @@
+use crate::{DwtProcessedYCrBrAMat, PaddedYCrBrAMat};
 use faer::traits::ComplexField;
 use faer::{Mat, MatRef};
 use num::Float;
+
+impl PaddedYCrBrAMat {
+    pub fn dwt(self) -> DwtProcessedYCrBrAMat {
+        DwtProcessedYCrBrAMat {
+            y: haar_dwt_2d(self.y.as_ref()),
+            cb: haar_dwt_2d(self.cb.as_ref()),
+            cr: haar_dwt_2d(self.cr.as_ref()),
+            a: self.a,
+            original_dimensions: self.original_dimensions,
+        }
+    }
+}
+
+impl DwtProcessedYCrBrAMat {
+    pub fn idwt(self) -> PaddedYCrBrAMat {
+        PaddedYCrBrAMat {
+            y: haar_idwt_2d(
+                self.y.0.as_ref(),
+                self.y.1.as_ref(),
+                self.y.2.as_ref(),
+                self.y.3.as_ref(),
+            ),
+            cb: haar_idwt_2d(
+                self.cb.0.as_ref(),
+                self.cb.1.as_ref(),
+                self.cb.2.as_ref(),
+                self.cb.3.as_ref(),
+            ),
+            cr: haar_idwt_2d(
+                self.cr.0.as_ref(),
+                self.cr.1.as_ref(),
+                self.cr.2.as_ref(),
+                self.cr.3.as_ref(),
+            ),
+            a: self.a,
+            original_dimensions: self.original_dimensions,
+        }
+    }
+}
 
 /// 单层二维 Haar DWT：直接 2x2 block，返回 (LL, HL, LH, HH)
 pub fn haar_dwt_2d<T: Float + ComplexField + Send + Sync>(
