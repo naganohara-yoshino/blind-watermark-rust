@@ -40,3 +40,31 @@ fn dct_mat_normalized(n: usize) -> Mat<f32> {
     });
     dct_mat
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use approx::assert_relative_eq;
+    #[test]
+    fn test_dct2_2d() {
+        let mat = mat![[1.0, 2.0], [3.0, 4.0],];
+        let out = dct2_2d(mat.as_ref());
+        let expected = mat![[5.0, -1.0], [-2.0, 0.0],];
+        for r in 0..out.nrows() {
+            for c in 0..out.ncols() {
+                assert_relative_eq!(out[(r, c)], expected[(r, c)], epsilon = 1e-6);
+            }
+        }
+    }
+    #[test]
+    fn test_dct3_2d() {
+        let mat = mat![[5.0, -1.0], [-2.0, 0.0],];
+        let out = dct3_2d(mat.as_ref());
+        let expected = mat![[1.0, 2.0], [3.0, 4.0],];
+        for r in 0..out.nrows() {
+            for c in 0..out.ncols() {
+                assert_relative_eq!(out[(r, c)], expected[(r, c)], epsilon = 1e-6);
+            }
+        }
+    }
+}
