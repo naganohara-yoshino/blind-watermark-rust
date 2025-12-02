@@ -1,9 +1,12 @@
+use crate::YCrBrAMat;
 use faer::prelude::*;
+use faer::traits::ComplexField;
 use image::Rgba32FImage;
 use image::{Rgb, Rgba};
+use num::Float;
 
 /// 浮点 YCrBr 像素，Cb/Cr 中心化到 [-0.5, 0.5]
-pub struct YCrBrPixel<T> {
+pub struct YCrBrPixel<T: Float + ComplexField + Send + Sync> {
     pub y: T,
     pub cb: T,
     pub cr: T,
@@ -31,7 +34,7 @@ impl From<YCrBrPixel<f32>> for Rgb<f32> {
 }
 
 /// 浮点 YCrBrA 像素，带 alpha
-pub struct YCrBrAPixel<T> {
+pub struct YCrBrAPixel<T: Float + ComplexField + Send + Sync> {
     pub y: T,
     pub cb: T,
     pub cr: T,
@@ -58,25 +61,19 @@ impl From<YCrBrAPixel<f32>> for Rgba<f32> {
     }
 }
 
-struct YCrBrAMat {
-    y: Mat<f32>,
-    cb: Mat<f32>,
-    cr: Mat<f32>,
-    a: Mat<f32>,
-    dimensions: (u32, u32),
-}
-
 impl From<Rgba32FImage> for YCrBrAMat {
     fn from(img: Rgba32FImage) -> Self {
-        let (width, height) = img.dimensions();
-        let mut y = Mat::<f32>::zeros(height as usize, width as usize);
-        let mut cb = Mat::<f32>::zeros(height as usize, width as usize);
-        let mut cr = Mat::<f32>::zeros(height as usize, width as usize);
-        let mut a = Mat::<f32>::zeros(height as usize, width as usize);
+        let (height, width) = img.dimensions();
+        let width = width as usize;
+        let height = height as usize;
+        let mut y = Mat::<f32>::zeros(height, width);
+        let mut cb = Mat::<f32>::zeros(height, width);
+        let mut cr = Mat::<f32>::zeros(height, width);
+        let mut a = Mat::<f32>::zeros(height, width);
 
-        for i in 0..height as usize {
-            for j in 0..width as usize {
-                let pixel = *img.get_pixel(j as u32, i as u32);
+        for i in 0..height {
+            for j in 0..width {
+                let &pixel = img.get_pixel(j as u32, i as u32);
                 let ycbcra: YCrBrAPixel<f32> = pixel.into();
                 y[(i, j)] = ycbcra.y;
                 cb[(i, j)] = ycbcra.cb;
@@ -89,17 +86,17 @@ impl From<Rgba32FImage> for YCrBrAMat {
             cb,
             cr,
             a,
-            dimensions: (width, height),
+            dimensions: (height, width),
         }
     }
 }
 
 impl From<YCrBrAMat> for Rgba32FImage {
     fn from(mat: YCrBrAMat) -> Self {
-        let (width, height) = mat.dimensions;
-        let mut img = Rgba32FImage::new(width, height);
-        for i in 0..height as usize {
-            for j in 0..width as usize {
+        let (height, width) = mat.dimensions;
+        let mut img = Rgba32FImage::new(width as u32, height as u32);
+        for i in 0..height {
+            for j in 0..width {
                 let ycbcra = YCrBrAPixel {
                     y: mat.y[(i, j)],
                     cb: mat.cb[(i, j)],

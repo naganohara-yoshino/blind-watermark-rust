@@ -3,7 +3,9 @@ use faer::{Mat, MatRef};
 use num::Float;
 
 /// 单层二维 Haar DWT：直接 2x2 block，返回 (LL, HL, LH, HH)
-fn haar_dwt2<T: Float + ComplexField>(mat: MatRef<T>) -> (Mat<T>, Mat<T>, Mat<T>, Mat<T>) {
+pub fn haar_dwt_2d<T: Float + ComplexField + Send + Sync>(
+    mat: MatRef<T>,
+) -> (Mat<T>, Mat<T>, Mat<T>, Mat<T>) {
     let (rows, cols) = mat.shape();
     assert!(rows % 2 == 0 && cols % 2 == 0);
 
@@ -35,7 +37,7 @@ fn haar_dwt2<T: Float + ComplexField>(mat: MatRef<T>) -> (Mat<T>, Mat<T>, Mat<T>
 }
 
 /// 逆变换：由 (LL, HL, LH, HH) 重建原矩阵
-fn haar_idwt2<T: Float + ComplexField>(
+pub fn haar_idwt_2d<T: Float + ComplexField + Send + Sync>(
     ll: MatRef<T>,
     hl: MatRef<T>,
     lh: MatRef<T>,
@@ -86,7 +88,7 @@ mod tests {
         ];
 
         // 直接二维 Haar 分解
-        let (ll, hl, lh, hh) = haar_dwt2(data.as_ref());
+        let (ll, hl, lh, hh) = haar_dwt_2d(data.as_ref());
         let expected_ll = mat![[7.0, 11.0], [23.0, 27.0],];
         let expected_hl = Mat::<f64>::ones(2, 2) * (-1.0);
         let expected_lh = Mat::<f64>::ones(2, 2) * (-4.0);
@@ -109,7 +111,7 @@ mod tests {
         let lh = Mat::<f64>::ones(2, 2) * (-4.0);
         let hh = Mat::<f64>::zeros(2, 2);
 
-        let reconstructed = haar_idwt2(ll.as_ref(), hl.as_ref(), lh.as_ref(), hh.as_ref());
+        let reconstructed = haar_idwt_2d(ll.as_ref(), hl.as_ref(), lh.as_ref(), hh.as_ref());
         let expected = mat![
             [1.0, 2.0, 3.0, 4.0],
             [5.0, 6.0, 7.0, 8.0],
@@ -134,7 +136,7 @@ mod tests {
         ];
 
         // 直接二维 Haar 分解
-        let (ll, hl, lh, hh) = haar_dwt2(data.as_ref());
+        let (ll, hl, lh, hh) = haar_dwt_2d(data.as_ref());
         let expected_ll = mat![[7.0f32, 11.0], [23.0, 27.0],];
         let expected_hl = Mat::<f32>::ones(2, 2) * (-1.0);
         let expected_lh = Mat::<f32>::ones(2, 2) * (-4.0);
@@ -157,7 +159,7 @@ mod tests {
         let lh = Mat::<f32>::ones(2, 2) * (-4.0);
         let hh = Mat::<f32>::zeros(2, 2);
 
-        let reconstructed = haar_idwt2(ll.as_ref(), hl.as_ref(), lh.as_ref(), hh.as_ref());
+        let reconstructed = haar_idwt_2d(ll.as_ref(), hl.as_ref(), lh.as_ref(), hh.as_ref());
         let expected = mat![
             [1.0f32, 2.0, 3.0, 4.0],
             [5.0, 6.0, 7.0, 8.0],
