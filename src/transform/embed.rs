@@ -1,8 +1,88 @@
 use crate::{
-    Block,
+    Block, BlockCutted, Imbedded,
     config::WatermarkConfig,
     transform::dct::{dct2_2d, dct3_2d},
 };
+use bitvec::prelude::*;
+
+impl BlockCutted {
+    /// Embed watermark bits into blocks (Y, Cb, Cr)
+    pub fn embed_watermark_bits(
+        self,
+        watermark_bits: BitVec,
+        config: &WatermarkConfig,
+    ) -> Imbedded {
+        let wm_len = watermark_bits.len();
+        let nblocks = self.nblocks;
+
+        assert!(nblocks >= wm_len, "not enough blocks for watermark");
+
+        let mut y_ll_blocks = Vec::with_capacity(nblocks);
+        let mut cb_ll_blocks = Vec::with_capacity(nblocks);
+        let mut cr_ll_blocks = Vec::with_capacity(nblocks);
+
+        for i in 0..nblocks {
+            // Cyclic embedding for each block at there channels
+            let bit = watermark_bits[i % wm_len];
+
+            y_ll_blocks.push(self.y_ll_blocks[i].imbed_bit(bit, config));
+            cb_ll_blocks.push(self.cb_ll_blocks[i].imbed_bit(bit, config));
+            cr_ll_blocks.push(self.cr_ll_blocks[i].imbed_bit(bit, config));
+        }
+
+        Imbedded {
+            y_ll_blocks,
+            cb_ll_blocks,
+            cr_ll_blocks,
+            y: self.y,
+            cb: self.cb,
+            cr: self.cr,
+            a: self.a,
+            original_dimensions: self.original_dimensions,
+        }
+    }
+
+    /// Extract watermark bits with 3-channel majority voting
+    pub fn extract_watermark_bits(self, wm_shape_len: usize, config: &WatermarkConfig) -> BitVec {
+        let wm_len = wm_shape_len;
+        let nblocks = self.nblocks;
+
+        assert!(wm_len > 0, "wm_shape_len cannot be zero");
+        assert!(nblocks > 0);
+
+        // Each block gives one bit from each channel
+        let mut y_bits = Vec::with_capacity(nblocks);
+        let mut cb_bits = Vec::with_capacity(nblocks);
+        let mut cr_bits = Vec::with_capacity(nblocks);
+
+        for i in 0..nblocks {
+            y_bits.push(self.y_ll_blocks[i].extract_bit(config));
+            cb_bits.push(self.cb_ll_blocks[i].extract_bit(config));
+            cr_bits.push(self.cr_ll_blocks[i].extract_bit(config));
+        }
+
+        let mut final_bits = BitVec::with_capacity(wm_len);
+        for i in 0..wm_len {
+            // gather bits from all blocks that correspond to this watermark index
+            let mut sum = 0u32;
+            let mut count = 0u32;
+
+            let mut j = i;
+            while j < nblocks {
+                // majority over Y/Cb/Cr for this block
+                let block_sum = y_bits[j] as u8 + cb_bits[j] as u8 + cr_bits[j] as u8;
+                sum += block_sum as u32;
+                count += 3;
+                j += wm_len;
+            }
+
+            // final recovered bit
+            final_bits.push(sum * 2 >= count); // average > 0.5
+        }
+
+        final_bits
+    }
+}
 
 impl Block {
     fn imbed_bit(&self, bit: bool, config: &WatermarkConfig) -> Block {

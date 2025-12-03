@@ -54,6 +54,8 @@ pub struct BlockCutted {
     pub a: Mat<f32>,
     /// (height, width),
     pub original_dimensions: (usize, usize),
+
+    pub nblocks: usize,
 }
 
 #[derive(Clone, Debug)]
