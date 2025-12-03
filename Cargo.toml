@@ -10,6 +10,8 @@ faer-ext = { version = "0.7", features = ["ndarray"] }
 yuv = "0.8"
 image = "0.25"
 num = "0.4"
+bitvec = "1.0"
+derive_builder = "0.20"
 
 [profile.dev.package.faer]
 opt-level = 3

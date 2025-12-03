@@ -1,32 +1,30 @@
-#[derive(Debug, Clone)]
+use derive_builder::Builder;
+
+#[derive(Debug, Clone, Builder)]
 pub struct WatermarkConfig {
     /// 嵌入强度 (对应 d1)
-    pub strength_low: f32,
+    #[builder(default = "36.0")]
+    pub strength_1: f32,
+    /// 嵌入强度 (对应 d2)
+    #[builder(default = "20.0")]
+    pub strength_2: f32,
     /// 随机种子/密码
-    pub password: Option<u64>,
+    #[builder(default = "WatermarkMode::Normal")]
+    pub mode: WatermarkMode,
+}
+
+#[derive(Debug, Clone)]
+pub enum WatermarkMode {
+    Normal,
+    WithPassword(String),
 }
 
 impl Default for WatermarkConfig {
     fn default() -> Self {
         Self {
-            strength_low: 36.0,
-            password: None,
+            strength_1: 36.0,
+            strength_2: 20.0,
+            mode: WatermarkMode::Normal,
         }
     }
 }
-
-// pub struct ConfigBuilder {
-//     config: WatermarkConfig,
-// }
-
-// impl ConfigBuilder {
-//     pub fn new() -> Self { /* ... */
-//     }
-//     pub fn password(mut self, pwd: u64) -> Self { /* ... */
-//     }
-//     pub fn strength(mut self, d1: f32) -> Self { /* ... */
-//     }
-//     pub fn build(self) -> WatermarkConfig {
-//         self.config
-//     }
-// }
