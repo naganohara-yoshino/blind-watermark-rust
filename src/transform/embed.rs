@@ -1,9 +1,13 @@
-use crate::{Block, config::WatermarkConfig};
+use crate::{
+    Block,
+    config::WatermarkConfig,
+    transform::dct::{dct2_2d, dct3_2d},
+};
 
 impl Block {
     fn imbed_bit(&self, bit: bool, config: &WatermarkConfig) -> Block {
         // Attempt SVD on the current matrix; fallback to original block if it fails
-        let Ok(svd_output) = self.mat_data.as_ref().svd() else {
+        let Ok(svd_output) = dct2_2d(self.mat_data.as_ref()).svd() else {
             return self.clone();
         };
 
@@ -21,14 +25,14 @@ impl Block {
         s[0] = embed_quantization(s[0], bit, strength);
 
         // Reconstruct the matrix and return a new Block
-        Block {
-            mat_data: u * s * v.transpose(),
-        }
+
+        let mat_data = dct3_2d((u * s * v.transpose()).as_ref());
+        Block { mat_data }
     }
 
     fn extract_bit(&self, config: &WatermarkConfig) -> bool {
         // Retrieve singular values; return false if unavailable
-        let Ok(singular) = self.mat_data.as_ref().singular_values() else {
+        let Ok(singular) = dct2_2d(self.mat_data.as_ref()).singular_values() else {
             return false;
         };
 
@@ -56,10 +60,11 @@ mod tests {
 
     /// Helper to create a simple test Block
     fn create_test_block() -> Block {
-        let data= Mat::<f32>::full(4,4 , 1.0);
-        Block { mat_data: data.into() }
+        let data = Mat::<f32>::full(4, 4, 1.0);
+        Block {
+            mat_data: data.into(),
+        }
     }
-
 
     #[test]
     fn test_embed_extract_bit_true() {
@@ -79,7 +84,6 @@ mod tests {
     fn test_embed_extract_bit_false() {
         let block = create_test_block();
         let config = WatermarkConfig::default();
-
 
         // Embed a false bit
         let watermarked = block.imbed_bit(false, &config);
