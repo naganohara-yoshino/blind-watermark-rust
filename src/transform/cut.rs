@@ -1,5 +1,4 @@
-use crate::{Block, BlockCutted, DwtedYCrBrAMat};
-const BLOCK_SIZE: usize = 4;
+use crate::{BLOCK_SIZE, Block, BlockCutted, DwtedYCrBrAMat};
 
 impl DwtedYCrBrAMat {
     pub fn cut(self) -> BlockCutted {
@@ -46,7 +45,7 @@ impl DwtedYCrBrAMat {
             cr: self.cr,
             a: self.a,
             original_dimensions: self.original_dimensions,
-            nblocks: block_count_height * block_count_width,
+            blocks_dimensions: (block_count_height, block_count_width),
         }
     }
 }

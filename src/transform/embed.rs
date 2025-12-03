@@ -13,7 +13,7 @@ impl BlockCutted {
         config: &WatermarkConfig,
     ) -> Imbedded {
         let wm_len = watermark_bits.len();
-        let nblocks = self.nblocks;
+        let nblocks = self.blocks_dimensions.0 * self.blocks_dimensions.1;
 
         assert!(nblocks >= wm_len, "not enough blocks for watermark");
 
@@ -39,13 +39,14 @@ impl BlockCutted {
             cr: self.cr,
             a: self.a,
             original_dimensions: self.original_dimensions,
+            blocks_dimensions: self.blocks_dimensions,
         }
     }
 
     /// Extract watermark bits with 3-channel majority voting
     pub fn extract_watermark_bits(self, wm_shape_len: usize, config: &WatermarkConfig) -> BitVec {
         let wm_len = wm_shape_len;
-        let nblocks = self.nblocks;
+        let nblocks = self.blocks_dimensions.0 * self.blocks_dimensions.1;
 
         assert!(wm_len > 0, "wm_shape_len cannot be zero");
         assert!(nblocks > 0);
