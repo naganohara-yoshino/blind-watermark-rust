@@ -1,19 +1,5 @@
-use crate::Block;
 use faer::prelude::*;
 use std::f32::consts::PI;
-
-impl Block {
-    pub fn dct(self) -> Block {
-        Block {
-            mat_data: dct2_2d(self.mat_data.as_ref()),
-        }
-    }
-    pub fn idct(self) -> Block {
-        Block {
-            mat_data: dct3_2d(self.mat_data.as_ref()),
-        }
-    }
-}
 
 pub fn dct2_2d(mat: MatRef<f32>) -> Mat<f32> {
     assert!(mat.ncols() == mat.nrows());

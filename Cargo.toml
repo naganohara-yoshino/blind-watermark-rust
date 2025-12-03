@@ -6,8 +6,6 @@ edition = "2024"
 [dependencies]
 anyhow = "1"
 faer = "0.23"
-faer-ext = { version = "0.7", features = ["ndarray"] }
-yuv = "0.8"
 image = "0.25"
 num = "0.4"
 bitvec = "1.0"
