@@ -4,8 +4,8 @@
 //! Extract : PaddedYCrBrAMat -(dwt)->DwtedYCrBrAMat -(cut)-> BlockCutted， and we can read from Blocks
 use faer::prelude::*;
 const BLOCK_SIZE: usize = 4;
-
 pub mod config;
+pub mod prelude;
 pub mod transform;
 pub struct YCrBrAMat {
     pub y: Mat<f32>,

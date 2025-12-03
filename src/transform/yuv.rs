@@ -63,7 +63,7 @@ impl From<YCrBrAPixel<f32>> for Rgba<f32> {
 
 impl From<Rgba32FImage> for YCrBrAMat {
     fn from(img: Rgba32FImage) -> Self {
-        let (height, width) = img.dimensions();
+        let (width, height) = img.dimensions();
         let width = width as usize;
         let height = height as usize;
         let mut y = Mat::<f32>::zeros(height, width);

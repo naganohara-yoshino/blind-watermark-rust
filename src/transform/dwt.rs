@@ -4,7 +4,7 @@ use faer::{Mat, MatRef};
 use num::Float;
 
 impl AssembledYCrBrAMat {
-    fn idwt(self) -> PaddedYCrBrAMat {
+    pub fn idwt(self) -> PaddedYCrBrAMat {
         PaddedYCrBrAMat {
             y: haar_idwt_2d(
                 self.y.0.as_ref(),
