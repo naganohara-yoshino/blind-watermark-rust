@@ -1,6 +1,6 @@
 //! io related types from image crate <-> YCrBrAMat and  YCrBrAMat <-> PaddedYCrBrAMat  is done by simple `into()`
 //! The transform pipeline is as follows (io ignored):
-//! Embed : PaddedYCrBrAMat -(dwt)->DwtedYCrBrAMat -(cut)-> BlockCutted -(black embed)-> Imbedded -(assemble)-> AssembledYCrBrAMat -(dedwt)-> PaddedYCrBrAMat
+//! Embed : PaddedYCrBrAMat -(dwt)->DwtedYCrBrAMat -(cut)-> BlockCutted -(black embed)-> Imbedded -(assemble)-> AssembledYCrBrAMat -(idwt)-> PaddedYCrBrAMat
 //! Extract : PaddedYCrBrAMat -(dwt)->DwtedYCrBrAMat -(cut)-> BlockCutted， and we can read from Blocks
 use faer::prelude::*;
 const BLOCK_SIZE: usize = 4;

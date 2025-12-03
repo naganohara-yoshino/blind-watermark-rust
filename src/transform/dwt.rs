@@ -1,7 +1,34 @@
-use crate::{DwtedYCrBrAMat, PaddedYCrBrAMat};
+use crate::{AssembledYCrBrAMat, DwtedYCrBrAMat, PaddedYCrBrAMat};
 use faer::traits::ComplexField;
 use faer::{Mat, MatRef};
 use num::Float;
+
+impl AssembledYCrBrAMat {
+    fn idwt(self) -> PaddedYCrBrAMat {
+        PaddedYCrBrAMat {
+            y: haar_idwt_2d(
+                self.y.0.as_ref(),
+                self.y.1.as_ref(),
+                self.y.2.as_ref(),
+                self.y.3.as_ref(),
+            ),
+            cb: haar_idwt_2d(
+                self.cb.0.as_ref(),
+                self.cb.1.as_ref(),
+                self.cb.2.as_ref(),
+                self.cb.3.as_ref(),
+            ),
+            cr: haar_idwt_2d(
+                self.cr.0.as_ref(),
+                self.cr.1.as_ref(),
+                self.cr.2.as_ref(),
+                self.cr.3.as_ref(),
+            ),
+            a: self.a,
+            original_dimensions: self.original_dimensions,
+        }
+    }
+}
 
 impl PaddedYCrBrAMat {
     pub fn dwt(self) -> DwtedYCrBrAMat {
