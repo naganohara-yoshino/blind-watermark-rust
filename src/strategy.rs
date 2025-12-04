@@ -1,7 +1,6 @@
 use rand::{seq::SliceRandom, SeedableRng};
 use rand_pcg::Pcg64;
 
-use crate::config::WatermarkMode;
 
 /// A permutation strategy for randomizing watermark embedding positions.
 ///
@@ -11,6 +10,7 @@ use crate::config::WatermarkMode;
 pub struct Permutation {
     /// The permuted indices.
     pub f: Vec<usize>,
+    pub n: usize,
 }
 
 impl Permutation {
@@ -24,36 +24,22 @@ impl Permutation {
         let mut rng = Pcg64::seed_from_u64(seed);
         let mut f: Vec<usize> = (0..n).collect();
         f.shuffle(&mut rng);
-        Self { f }
+        Self { f, n }
     }
-}
 
-impl WatermarkMode {
+
     /// Calculates the position of the watermark bit corresponding to a given block.
     ///
     /// # Arguments
     ///
     /// * `block_position` - The index of the image block.
     /// * `wm_len` - The length of the watermark.
-    /// * `nblocks` - The total number of blocks.
     ///
     /// # Returns
     ///
     /// The index of the watermark bit to be embedded in/extracted from the block.
-    pub fn corresponding_wmbits_position(
-        &self,
-        block_position: usize,
-        wm_len: usize,
-        nblocks: usize,
-    ) -> usize {
-        match self {
-            // Cycling corresponding watermark bits
-            WatermarkMode::Normal => block_position % wm_len,
-            // Using Permutation
-            WatermarkMode::Strategy(seed) => {
-                Permutation::new(nblocks, *seed).f[block_position] % wm_len
-            }
-        }
+    pub fn corresponding_wmbits_position(&self, block_position: usize, wm_len: usize) -> usize {
+        self.f[block_position] % wm_len
     }
 
     /// Finds all block positions that correspond to a specific watermark bit position.
@@ -62,26 +48,18 @@ impl WatermarkMode {
     ///
     /// * `wmbits_position` - The index of the watermark bit.
     /// * `wm_len` - The length of the watermark.
-    /// * `nblocks` - The total number of blocks.
     ///
     /// # Returns
     ///
     /// A vector of block indices that should contain the specified watermark bit.
     pub fn corresponding_block_positions(
-        self,
+        &self,
         wmbits_position: usize,
         wm_len: usize,
-        nblocks: usize,
     ) -> Vec<usize> {
-        match self {
-            // Cycling corresponding watermark bits
-            WatermarkMode::Normal => (0..nblocks)
-                .filter(|&i| i % wm_len == wmbits_position)
-                .collect(),
-            // Using Permutation
-            WatermarkMode::Strategy(seed) => (0..nblocks)
-                .filter(|&i| Permutation::new(nblocks, seed).f[i] % wm_len == wmbits_position)
-                .collect(),
-        }
+
+        (0..self.n)
+            .filter(|&i| self.f[i] % wm_len == wmbits_position)
+            .collect()
     }
 }

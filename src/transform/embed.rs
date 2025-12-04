@@ -1,6 +1,7 @@
 use crate::{
-    config::WatermarkConfig,
-    quantization::{embed_quantization, extract_quantization},
+    config::{WatermarkConfig, WatermarkMode},
+    quantization::{embed_quantization, extract_quantization, average_value},
+    strategy::Permutation,
     transform::dct::{dct2_2d, dct3_2d},
     Block, BlockCutted, Imbedded,
 };
@@ -20,12 +21,18 @@ impl BlockCutted {
 
         assert!(nblocks >= wm_len, "not enough blocks for watermark");
 
+        let perm = match config.mode {
+            WatermarkMode::Normal => Permutation {
+                f: (0..nblocks).collect(),
+                n: nblocks,
+            },
+            WatermarkMode::Strategy(seed) => Permutation::new(nblocks, seed),
+        };
+
         let (y_ll_blocks, cb_ll_blocks, cr_ll_blocks) = (0..nblocks)
             .into_par_iter()
             .map(|i| {
-                let bit = watermark_bits[config
-                    .mode
-                    .corresponding_wmbits_position(i, wm_len, nblocks)];
+                let bit = watermark_bits[perm.corresponding_wmbits_position(i, wm_len)];
                 (
                     self.y_ll_blocks[i].imbed_bit(bit, config),
                     self.cb_ll_blocks[i].imbed_bit(bit, config),
@@ -56,6 +63,14 @@ impl BlockCutted {
         assert!(wm_len > 0, "wm_len cannot be zero");
         assert!(nblocks > 0);
 
+        let perm = match config.mode {
+            WatermarkMode::Normal => Permutation {
+                f: (0..nblocks).collect(),
+                n: nblocks,
+            },
+            WatermarkMode::Strategy(seed) => Permutation::new(nblocks, seed),
+        };
+
         // 1. Parallel extraction of bits for Y, Cb and Cr at each block position `i`.
         let block_bits: Vec<_> = (0..nblocks)
             .into_par_iter()
@@ -70,11 +85,10 @@ impl BlockCutted {
 
         // 2. Parallel majority voting for deciding each watermark bit at bitvec position `i`.
         (0..wm_len)
-            .into_par_iter()
+            // .into_par_iter()
             .map(|i| {
-                let corresponding_block_positions = config
-                    .mode
-                    .corresponding_block_positions(i, wm_len, nblocks);
+                let corresponding_block_positions = perm
+                    .corresponding_block_positions(i, wm_len);
 
                 // Sum over the possible blocks corresponding to this watermark bit `i`
                 let total = corresponding_block_positions
@@ -111,10 +125,14 @@ impl Block {
         let mut s = svd_output.S() * 1.0;
 
         // Retrieve quantization strength
-        let strength = config.strength_1;
+        let strength_1 = config.strength_1;
 
         // Modify the primary singular value to embed the bit
-        s[0] = embed_quantization(s[0], bit, strength);
+        s[0] = embed_quantization(s[0], bit, strength_1);
+
+        if let Some(strength_2) = config.strength_2 {
+            s[1] = embed_quantization(s[1], bit, strength_2);
+        }
 
         // Reconstruct the matrix and return a new Block
 
@@ -127,9 +145,17 @@ impl Block {
         let Ok(singular) = dct2_2d(self.mat_data.as_ref()).singular_values() else {
             return false;
         };
+// Extract the bit from the primary singular value
+        match config.strength_2 {
+            None => extract_quantization(singular[0], config.strength_1),
+            Some(strength_2) => {
+            let first = extract_quantization(singular[0], config.strength_1);
+            let second = extract_quantization(singular[1], config.strength_2);
+            average_value(first, second)
+        }
 
-        // Extract the bit from the primary singular value
-        extract_quantization(singular[0], config.strength_1)
+        
+        
     }
 }
 
