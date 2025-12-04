@@ -9,7 +9,7 @@ A Rust library for blind image watermarking using DWT (Discrete Wavelet Transfor
 - **High Performance**: Developed in Rust, leveraging the `faer` crate for efficient matrix computations and `rayon` for multi-threading support.
 - **Flexible**: Supports embedding arbitrary binary data (e.g. `Vec<u8>`). String watermarking is natively supported.
 - **Random Strategy**: Supports randomized block selection for embedding watermarks, enhancing security.
-- **High-Level API**: Provides a fluent builder-like API for easy integration.
+- **High-Level API**: Provides a fluent API for easy integration.
 
 ### Original Image
 ![Original](/tests/example.jpg)

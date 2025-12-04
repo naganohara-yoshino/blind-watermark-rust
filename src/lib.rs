@@ -7,9 +7,10 @@
 //! - **Blind Watermarking**: Extract the watermark without needing the original image.
 //! - **Robust Algorithm**: Combines DWT, DCT, and SVD for embedding watermarks in the frequency domain.
 //! - **High Performance**: Developed in Rust, leveraging the `faer` crate for efficient matrix computations and `rayon` for multi-threading support.
-//! - **Flexible**: Supports embedding arbitrary binary data.
-//! - **Random Strategy**: Supports randomized block selection for embedding watermarks, enhancing security.
-//! - **High-Level API**: Provides a fluent builder-like API for easy integration.
+//! - **Flexible**: Supports embedding arbitrary binary data (e.g. `Vec<u8>`). String watermarking is natively supported.
+//！- **Random Strategy**: Supports randomized block selection for embedding watermarks, enhancing security.
+//！- **High-Level API**: Provides a fluent API for easy integration.
+
 
 pub mod config;
 pub mod prelude;
