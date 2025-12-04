@@ -7,6 +7,17 @@ use crate::{
     YCrBrAMat,
 };
 
+/// Extracts a watermark from an image using the specified strategy.
+///
+/// # Arguments
+///
+/// * `img_path` - Path to the watermarked image.
+/// * `wm_len` - Length of the watermark in bits.
+/// * `seed` - Seed used for the random strategy during embedding.
+///
+/// # Returns
+///
+/// The extracted watermark as a `BitVec`.
 pub fn extract_watermark(img_path: &str, wm_len: usize, seed: u64) -> Result<BitVec> {
     let img = ImageReader::open(img_path)?.decode()?.into_rgba32f();
 
@@ -21,6 +32,14 @@ pub fn extract_watermark(img_path: &str, wm_len: usize, seed: u64) -> Result<Bit
         .extract_watermark_bits(wm_len, &config))
 }
 
+/// Embeds a watermark into an image using the specified strategy.
+///
+/// # Arguments
+///
+/// * `img_path` - Path to the input image.
+/// * `img_output_path` - Path to save the watermarked image.
+/// * `watermark` - The watermark bits to embed.
+/// * `seed` - Seed for the random strategy.
 pub fn embed_watermark(
     img_path: &str,
     img_output_path: &str,

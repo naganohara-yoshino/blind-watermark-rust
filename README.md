@@ -8,6 +8,8 @@ A Rust library for blind image watermarking using DWT (Discrete Wavelet Transfor
 - **Robust Algorithm**: Combines DWT, DCT, and SVD for embedding watermarks in the frequency domain.
 - **High Performance**: Developed in Rust, leveraging the `faer` crate for efficient matrix computations and `rayon` for multi-threading support.
 - **Flexible**: Supports embedding arbitrary binary data.
+- **Random Strategy**: Supports randomized block selection for embedding watermarks, enhancing security.
+- **High-Level API**: Provides a fluent builder-like API for easy integration.
 
 ### Original Image
 ![Original](/tests/example.jpg)
@@ -46,9 +48,15 @@ fn main() {
 
     // 3. Define watermark (bits)
     let watermark = bitvec![0, 1, 0, 1, 1, 0, 1, 0]; // Example bits
-    let config = WatermarkConfig::default();
+    
+    // 4. Configure watermark settings (Optional)
+    let config = WatermarkConfigBuilder::default()
+        .strength_1(36)
+        .mode(WatermarkMode::Strategy(12345)) // Use random strategy with seed
+        .build()
+        .unwrap();
 
-    // 4. Process pipeline: Padding -> DWT -> Cut Blocks -> Embed -> Assemble -> IDWT -> Remove Padding
+    // 5. Process pipeline: Padding -> DWT -> Cut Blocks -> Embed -> Assemble -> IDWT -> Remove Padding
     let processed = ycbcr
         .add_padding()
         .dwt()
@@ -58,7 +66,7 @@ fn main() {
         .idwt()
         .remove_padding();
 
-    // 5. Save the result
+    // 6. Save the result
     let processed_image: Rgba32FImage = processed.into();
     let output_image: DynamicImage = processed_image.into();
     output_image.to_rgb8().save("watermarked.png").unwrap();
@@ -83,10 +91,17 @@ fn main() {
         .into_rgba32f();
 
     let ycbcr: YCrBrAMat = img.into();
-    let config = WatermarkConfig::default();
+    
+    // 2. Use the same config as embedding
+    let config = WatermarkConfigBuilder::default()
+        .strength_1(36)
+        .mode(WatermarkMode::Strategy(12345))
+        .build()
+        .unwrap();
+        
     let watermark_len = 8; // Length of the embedded watermark
 
-    // 2. Process pipeline: Padding -> DWT -> Cut Blocks -> Extract
+    // 3. Process pipeline: Padding -> DWT -> Cut Blocks -> Extract
     let extracted_bits = ycbcr
         .add_padding()
         .dwt()
