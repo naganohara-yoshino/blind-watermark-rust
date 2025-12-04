@@ -184,7 +184,9 @@ dependencies = [
  "derive_builder",
  "faer",
  "image",
+ "itertools",
  "num",
+ "rayon",
 ]
 
 [[package]]

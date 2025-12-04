@@ -20,6 +20,8 @@ image = "0.25"
 num = "0.4"
 bitvec = "1.0"
 derive_builder = "0.20"
+rayon = "1.11"
+itertools = "0.14"
 
 [profile.dev.package.faer]
 opt-level = 3

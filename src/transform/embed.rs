@@ -4,6 +4,8 @@ use crate::{
     Block, BlockCutted, Imbedded,
 };
 use bitvec::prelude::*;
+use itertools::Itertools;
+use rayon::prelude::*;
 
 impl BlockCutted {
     /// Embed watermark bits into blocks (Y, Cb, Cr)
@@ -17,18 +19,19 @@ impl BlockCutted {
 
         assert!(nblocks >= wm_len, "not enough blocks for watermark");
 
-        let mut y_ll_blocks = Vec::with_capacity(nblocks);
-        let mut cb_ll_blocks = Vec::with_capacity(nblocks);
-        let mut cr_ll_blocks = Vec::with_capacity(nblocks);
-
-        for i in 0..nblocks {
-            // Cyclic embedding for each block at their channels
-            let bit = watermark_bits[i % wm_len];
-
-            y_ll_blocks.push(self.y_ll_blocks[i].imbed_bit(bit, config));
-            cb_ll_blocks.push(self.cb_ll_blocks[i].imbed_bit(bit, config));
-            cr_ll_blocks.push(self.cr_ll_blocks[i].imbed_bit(bit, config));
-        }
+        let (y_ll_blocks, cb_ll_blocks, cr_ll_blocks) = (0..nblocks)
+            .into_par_iter()
+            .map(|i| {
+                let bit = watermark_bits[i % wm_len];
+                (
+                    self.y_ll_blocks[i].imbed_bit(bit, config),
+                    self.cb_ll_blocks[i].imbed_bit(bit, config),
+                    self.cr_ll_blocks[i].imbed_bit(bit, config),
+                )
+            })
+            .collect::<Vec<_>>()
+            .into_iter()
+            .multiunzip();
 
         Imbedded {
             y_ll_blocks,
