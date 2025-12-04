@@ -2,6 +2,7 @@ use crate::{PaddedYCrBrAMat, YCrBrAMat};
 use faer::prelude::*;
 
 impl YCrBrAMat {
+    /// Add padding to the matrix to make dimensions even
     pub fn add_padding(mut self) -> PaddedYCrBrAMat {
         let (height, width) = self.dimensions;
 
@@ -55,6 +56,7 @@ impl YCrBrAMat {
 }
 
 impl PaddedYCrBrAMat {
+    /// Remove padding to restore original dimensions
     pub fn remove_padding(self) -> YCrBrAMat {
         YCrBrAMat {
             y: self

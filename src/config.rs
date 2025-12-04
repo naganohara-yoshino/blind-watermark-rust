@@ -2,13 +2,13 @@ use derive_builder::Builder;
 
 #[derive(Debug, Clone, Builder)]
 pub struct WatermarkConfig {
-    /// 嵌入强度 (对应 d1)
+    /// Embedding strength (corresponds to d1)
     #[builder(default = "36")]
     pub strength_1: i32,
-    /// 嵌入强度 (对应 d2)
+    /// Embedding strength (corresponds to d2)
     #[builder(default = "20")]
     pub strength_2: i32,
-    /// 随机种子/密码
+    /// Password
     #[builder(default = "WatermarkMode::Normal")]
     pub mode: WatermarkMode,
 }

@@ -5,7 +5,7 @@ use image::Rgba32FImage;
 use image::{Rgb, Rgba};
 use num::Float;
 
-/// 浮点 YCrBr 像素，Cb/Cr 中心化到 [-0.5, 0.5]
+/// Floating point YCrBr pixel, Cb/Cr centered at [-0.5, 0.5]
 pub struct YCrBrPixel<T: Float + ComplexField + Send + Sync> {
     pub y: T,
     pub cb: T,
@@ -16,8 +16,8 @@ impl From<Rgb<f32>> for YCrBrPixel<f32> {
     fn from(Rgb([r, g, b]): Rgb<f32>) -> Self {
         // BT.709 linear
         let y = 0.2126 * r + 0.7152 * g + 0.0722 * b;
-        let cb = (b - y) / 1.8556; // 蓝色差
-        let cr = (r - y) / 1.5748; // 红色差
+        let cb = (b - y) / 1.8556; // Blue difference
+        let cr = (r - y) / 1.5748; // Red difference
 
         YCrBrPixel { y, cb, cr }
     }
@@ -33,7 +33,7 @@ impl From<YCrBrPixel<f32>> for Rgb<f32> {
     }
 }
 
-/// 浮点 YCrBrA 像素，带 alpha
+/// Floating point YCrBrA pixel, with alpha
 pub struct YCrBrAPixel<T: Float + ComplexField + Send + Sync> {
     pub y: T,
     pub cb: T,
@@ -113,7 +113,7 @@ impl From<YCrBrAMat> for Rgba32FImage {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use approx::assert_relative_eq; // 用于浮点比较
+    use approx::assert_relative_eq; // For floating point comparison
 
     #[test]
     fn test_rgb_to_ycrbr_and_back() {
@@ -121,7 +121,7 @@ mod tests {
         let ycrbr: YCrBrPixel<f32> = rgb.into();
         let rgb_converted: Rgb<f32> = ycrbr.into();
 
-        // 因为浮点运算可能有微小误差，用 approx 比较
+        // Because floating point arithmetic may have small errors, use approx for comparison
         assert_relative_eq!(rgb.0[0], rgb_converted.0[0], max_relative = 1e-6);
         assert_relative_eq!(rgb.0[1], rgb_converted.0[1], max_relative = 1e-6);
         assert_relative_eq!(rgb.0[2], rgb_converted.0[2], max_relative = 1e-6);
@@ -143,13 +143,13 @@ mod tests {
     fn test_ycrbr_centered_values() {
         let rgb = Rgb([0.0, 0.0, 0.0]);
         let ycrbr: YCrBrPixel<f32> = rgb.into();
-        // 黑色时，cb/cr 应接近 0
+        // For black, cb/cr should be close to 0
         assert_relative_eq!(ycrbr.cb, 0.0, max_relative = 1e-6);
         assert_relative_eq!(ycrbr.cr, 0.0, max_relative = 1e-6);
 
         let rgb = Rgb([1.0, 1.0, 1.0]);
         let ycrbr: YCrBrPixel<f32> = rgb.into();
-        // 白色时，cb/cr 应接近 0
+        // For white, cb/cr should be close to 0
         assert_relative_eq!(ycrbr.cb, 0.0, max_relative = 1e-6);
         assert_relative_eq!(ycrbr.cr, 0.0, max_relative = 1e-6);
     }
@@ -158,7 +158,7 @@ mod tests {
     fn test_ycrbra_alpha_preserved() {
         let rgba = Rgba([0.3, 0.4, 0.5, 0.9]);
         let ycrbra: YCrBrAPixel<f32> = rgba.into();
-        // alpha 不参与转换，应该保持不变
+        // alpha is not involved in conversion, should remain unchanged
         assert_relative_eq!(ycrbra.a, 0.9, max_relative = 1e-6);
     }
 

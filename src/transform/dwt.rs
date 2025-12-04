@@ -69,7 +69,7 @@ impl DwtedYCrBrAMat {
     }
 }
 
-/// 单层二维 Haar DWT：直接 2x2 block，返回 (LL, HL, LH, HH)
+/// Single-level 2D Haar DWT: direct 2x2 block, returns (LL, HL, LH, HH)
 pub fn haar_dwt_2d<T: Float + ComplexField + Send + Sync>(
     mat: MatRef<T>,
 ) -> (Mat<T>, Mat<T>, Mat<T>, Mat<T>) {
@@ -103,7 +103,7 @@ pub fn haar_dwt_2d<T: Float + ComplexField + Send + Sync>(
     (ll, hl, lh, hh)
 }
 
-/// 逆变换：由 (LL, HL, LH, HH) 重建原矩阵
+/// Inverse transform: Reconstruct original matrix from (LL, HL, LH, HH)
 pub fn haar_idwt_2d<T: Float + ComplexField + Send + Sync>(
     ll: MatRef<T>,
     hl: MatRef<T>,
@@ -154,7 +154,7 @@ mod tests {
             [13.0, 14.0, 15.0, 16.0],
         ];
 
-        // 直接二维 Haar 分解
+        // Direct 2D Haar decomposition
         let (ll, hl, lh, hh) = haar_dwt_2d(data.as_ref());
         let expected_ll = mat![[7.0, 11.0], [23.0, 27.0],];
         let expected_hl = Mat::<f64>::ones(2, 2) * (-1.0);
@@ -202,7 +202,6 @@ mod tests {
             [13.0, 14.0, 15.0, 16.0],
         ];
 
-        // 直接二维 Haar 分解
         let (ll, hl, lh, hh) = haar_dwt_2d(data.as_ref());
         let expected_ll = mat![[7.0f32, 11.0], [23.0, 27.0],];
         let expected_hl = Mat::<f32>::ones(2, 2) * (-1.0);

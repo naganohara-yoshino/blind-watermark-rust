@@ -1,7 +1,7 @@
 //! io related types from image crate <-> YCrBrAMat and  YCrBrAMat <-> PaddedYCrBrAMat  is done by simple `into()`
 //! The transform pipeline is as follows (io ignored):
 //! Embed : PaddedYCrBrAMat -(dwt)->DwtedYCrBrAMat -(cut)-> BlockCutted -(black embed)-> Imbedded -(assemble)-> AssembledYCrBrAMat -(idwt)-> PaddedYCrBrAMat
-//! Extract : PaddedYCrBrAMat -(dwt)->DwtedYCrBrAMat -(cut)-> BlockCutted， and we can read from Blocks
+//! Extract : PaddedYCrBrAMat -(dwt)->DwtedYCrBrAMat -(cut)-> BlockCutted, and we can read from Blocks
 use faer::prelude::*;
 const BLOCK_SIZE: usize = 4;
 pub mod config;
@@ -14,7 +14,7 @@ pub struct YCrBrAMat {
     pub cb: Mat<f32>,
     pub cr: Mat<f32>,
     pub a: Mat<f32>,
-    /// (height, width),
+    /// Dimensions (height, width)
     pub dimensions: (usize, usize),
 }
 
@@ -24,21 +24,21 @@ pub struct PaddedYCrBrAMat {
     pub cb: Mat<f32>,
     pub cr: Mat<f32>,
     pub a: Mat<f32>,
-    /// (height, width),
+    /// Original dimensions (height, width)
     pub original_dimensions: (usize, usize),
 }
 
 #[derive(Clone, Debug)]
 pub struct DwtedYCrBrAMat {
-    ///(LL, HL, LH, HH)
+    /// Y channel components (LL, HL, LH, HH)
     pub y: (Mat<f32>, Mat<f32>, Mat<f32>, Mat<f32>),
-    ///(LL, HL, LH, HH)
+    /// Cb channel components (LL, HL, LH, HH)
     pub cb: (Mat<f32>, Mat<f32>, Mat<f32>, Mat<f32>),
-    ///(LL, HL, LH, HH)
+    /// Cr channel components (LL, HL, LH, HH)
     pub cr: (Mat<f32>, Mat<f32>, Mat<f32>, Mat<f32>),
 
     pub a: Mat<f32>,
-    /// (height, width),
+    /// Original dimensions (height, width)
     pub original_dimensions: (usize, usize),
 }
 #[derive(Clone, Debug)]
@@ -48,18 +48,18 @@ pub struct BlockCutted {
     pub cb_ll_blocks: Vec<Block>,
     pub cr_ll_blocks: Vec<Block>,
 
-    //Preserved for recovery
-    ///(LL, HL, LH, HH)
+    // Preserved for recovery
+    /// Y channel components (LL, HL, LH, HH)
     pub y: (Mat<f32>, Mat<f32>, Mat<f32>, Mat<f32>),
-    ///(LL, HL, LH, HH)
+    /// Cb channel components (LL, HL, LH, HH)
     pub cb: (Mat<f32>, Mat<f32>, Mat<f32>, Mat<f32>),
-    ///(LL, HL, LH, HH)
+    /// Cr channel components (LL, HL, LH, HH)
     pub cr: (Mat<f32>, Mat<f32>, Mat<f32>, Mat<f32>),
 
     pub a: Mat<f32>,
-    /// (height, width),
+    /// Original dimensions (height, width)
     pub original_dimensions: (usize, usize),
-    /// (height, width),
+    /// Dimensions of array of blocks (height, width)
     pub blocks_dimensions: (usize, usize),
 }
 
@@ -78,32 +78,32 @@ pub struct Imbedded {
     pub cb_ll_blocks: Vec<Block>,
     pub cr_ll_blocks: Vec<Block>,
 
-    //Preserved for recovery
-    ///(LL, HL, LH, HH)
+    // Preserved for recovery
+    /// Y channel components (LL, HL, LH, HH)
     pub y: (Mat<f32>, Mat<f32>, Mat<f32>, Mat<f32>),
-    ///(LL, HL, LH, HH)
+    /// Cb channel components (LL, HL, LH, HH)
     pub cb: (Mat<f32>, Mat<f32>, Mat<f32>, Mat<f32>),
-    ///(LL, HL, LH, HH)
+    /// Cr channel components (LL, HL, LH, HH)
     pub cr: (Mat<f32>, Mat<f32>, Mat<f32>, Mat<f32>),
 
     pub a: Mat<f32>,
-    /// (height, width),
+    /// Original dimensions (height, width)
     pub original_dimensions: (usize, usize),
-    /// (height, width),
+    /// Block dimensions (height, width)
     pub blocks_dimensions: (usize, usize),
 }
 
 #[derive(Clone, Debug)]
 pub struct AssembledYCrBrAMat {
-    ///(LL, HL, LH, HH)
+    /// Y channel components (LL, HL, LH, HH)
     pub y: (Mat<f32>, Mat<f32>, Mat<f32>, Mat<f32>),
-    ///(LL, HL, LH, HH)
+    /// Cb channel components (LL, HL, LH, HH)
     pub cb: (Mat<f32>, Mat<f32>, Mat<f32>, Mat<f32>),
-    ///(LL, HL, LH, HH)
+    /// Cr channel components (LL, HL, LH, HH)
     pub cr: (Mat<f32>, Mat<f32>, Mat<f32>, Mat<f32>),
 
     pub a: Mat<f32>,
-    /// (height, width),
+    /// Original dimensions (height, width)
     pub original_dimensions: (usize, usize),
 }
 

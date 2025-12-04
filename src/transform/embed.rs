@@ -22,7 +22,7 @@ impl BlockCutted {
         let mut cr_ll_blocks = Vec::with_capacity(nblocks);
 
         for i in 0..nblocks {
-            // Cyclic embedding for each block at there channels
+            // Cyclic embedding for each block at their channels
             let bit = watermark_bits[i % wm_len];
 
             y_ll_blocks.push(self.y_ll_blocks[i].imbed_bit(bit, config));

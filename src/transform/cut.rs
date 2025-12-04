@@ -1,6 +1,7 @@
-use crate::{BLOCK_SIZE, Block, BlockCutted, DwtedYCrBrAMat};
+use crate::{Block, BlockCutted, DwtedYCrBrAMat, BLOCK_SIZE};
 
 impl DwtedYCrBrAMat {
+    /// Cut the DWT transformed matrix into blocks
     pub fn cut(self) -> BlockCutted {
         let mut y_ll_blocks = Vec::new();
         let mut cb_ll_blocks = Vec::new();

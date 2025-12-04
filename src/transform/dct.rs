@@ -1,6 +1,7 @@
 use faer::prelude::*;
 use std::f32::consts::PI;
 
+/// Perform 2D Type-II Discrete Cosine Transform (DCT-II)
 pub fn dct2_2d(mat: MatRef<f32>) -> Mat<f32> {
     assert!(mat.ncols() == mat.nrows());
     let n = mat.ncols();
@@ -8,6 +9,7 @@ pub fn dct2_2d(mat: MatRef<f32>) -> Mat<f32> {
     &dct_mat * &mat * &dct_mat.transpose()
 }
 
+/// Perform 2D Type-III Discrete Cosine Transform (DCT-III), also known as IDCT
 pub fn dct3_2d(mat: MatRef<f32>) -> Mat<f32> {
     assert!(mat.ncols() == mat.nrows());
     let n = mat.ncols();
@@ -15,6 +17,7 @@ pub fn dct3_2d(mat: MatRef<f32>) -> Mat<f32> {
     &dct_mat.transpose() * &mat * &dct_mat
 }
 
+/// Generate a normalized DCT matrix of size n x n
 fn dct_mat_normalized(n: usize) -> Mat<f32> {
     let dct_mat = Mat::from_fn(n, n, |r, c| {
         let i = r as f32;
