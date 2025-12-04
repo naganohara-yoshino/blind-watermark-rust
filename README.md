@@ -1,6 +1,6 @@
 # Blind Watermark
 
-A Rust library for blind image watermarking using DWT (Discrete Wavelet Transform), DCT (Discrete Cosine Transform), and SVD (Singular Value Decomposition).
+A Rust library for blind image watermarking using DWT (Discrete Wavelet Transform), DCT (Discrete Cosine Transform), and SVD (Singular Value Decomposition). The algorithm is originally implemented in python by *Guo Fei* at [this repository](https://github.com/guofei9987/blind_watermark/). This is the rust rewritten version.
 
 ## Features
 
