@@ -145,15 +145,17 @@ impl Block {
         let Ok(singular) = dct2_2d(self.mat_data.as_ref()).singular_values() else {
             return false;
         };
-// Extract the bit from the primary singular value
+        // Extract the bit from the primary singular value
+        let strength_1 = config.strength_1;
+
         match config.strength_2 {
-            None => extract_quantization(singular[0], config.strength_1),
+            None => extract_quantization(singular[0], strength_1),
             Some(strength_2) => {
-            let first = extract_quantization(singular[0], config.strength_1);
-            let second = extract_quantization(singular[1], config.strength_2);
+            let first = extract_quantization(singular[0], strength_1);
+            let second = extract_quantization(singular[1], strength_2);
             average_value(first, second)
         }
-
+    }
         
         
     }

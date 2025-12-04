@@ -14,7 +14,7 @@ pub struct WatermarkConfig {
     /// Embedding strength (corresponds to second singular value).
     ///
     /// Recommended value is 20. If `None`, it is not used.
-    #[builder(default = "None")]
+    #[builder(default = "None", setter(strip_option))]
     pub strength_2: Option<i32>,
     /// Watermark mode.
     ///

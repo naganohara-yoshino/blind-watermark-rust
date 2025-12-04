@@ -6,5 +6,5 @@ fn main() {
     let processed = "processed.png";
     let watermark = bitvec![0, 1, 0, 1];
     let seed = 0;
-    embed_watermark(example, processed, watermark.clone(), seed).unwrap();
+    embed_watermark(example, processed, watermark.clone(), None).unwrap();
 }

@@ -3,7 +3,7 @@ use bitvec::prelude::*;
 use image::{DynamicImage, ImageReader, Rgba32FImage};
 
 use crate::{
-    config::{WatermarkConfigBuilder, WatermarkMode},
+    config::{WatermarkConfig, WatermarkConfigBuilder, WatermarkMode},
     YCrBrAMat,
 };
 
@@ -18,13 +18,18 @@ use crate::{
 /// # Returns
 ///
 /// The extracted watermark as a `BitVec`.
-pub fn extract_watermark(img_path: &str, wm_len: usize, seed: u64) -> Result<BitVec> {
+pub fn extract_watermark(img_path: &str, wm_len: usize, seed: Option<u64>) -> Result<BitVec> {
     let img = ImageReader::open(img_path)?.decode()?.into_rgba32f();
 
     let ycbcr: YCrBrAMat = img.into();
-    let config = WatermarkConfigBuilder::default()
-        .mode(WatermarkMode::Strategy(seed))
-        .build()?;
+
+    let config = match seed {
+        None => WatermarkConfig::default(),
+        Some(seed) => WatermarkConfigBuilder::default()
+            .mode(WatermarkMode::Strategy(seed))
+            .strength_2(20)
+            .build()?,
+    };
     Ok(ycbcr
         .add_padding()
         .dwt()
@@ -44,13 +49,17 @@ pub fn embed_watermark(
     img_path: &str,
     img_output_path: &str,
     watermark: BitVec,
-    seed: u64,
+    seed: Option<u64>,
 ) -> Result<()> {
     let img = ImageReader::open(img_path)?.decode()?.into_rgba32f();
     let ycbcr: YCrBrAMat = img.into();
-    let config = WatermarkConfigBuilder::default()
-        .mode(WatermarkMode::Strategy(seed))
-        .build()?;
+    let config = match seed {
+        None => WatermarkConfig::default(),
+        Some(seed) => WatermarkConfigBuilder::default()
+            .mode(WatermarkMode::Strategy(seed))
+            .strength_2(20)
+            .build()?,
+    };
     let processed = ycbcr
         .add_padding()
         .dwt()
