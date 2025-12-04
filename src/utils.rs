@@ -117,6 +117,13 @@ pub fn extract_watermark_bytes(
     Ok(bv.into_vec())
 }
 
+/// Extracts a watermark from an image using the specified strategy.
+///
+/// # Arguments
+///
+/// * `img_path` - Path to the watermarked image.
+/// * `wm_len` - Length of the watermark in bits.
+/// * `seed` - Seed used for the random strategy during embedding.
 pub fn extract_watermark_string(
     img_path: &str,
     wm_len: usize,
@@ -127,6 +134,14 @@ pub fn extract_watermark_string(
     Ok(s)
 }
 
+/// Embeds a watermark into an image using the specified strategy.
+///
+/// # Arguments
+///
+/// * `img_path` - Path to the input image.
+/// * `img_output_path` - Path to save the watermarked image.
+/// * `watermark` - The watermark bits to embed.
+/// * `seed` - Seed for the random strategy.
 pub fn embed_watermark_string(
     img_path: &str,
     img_output_path: &str,

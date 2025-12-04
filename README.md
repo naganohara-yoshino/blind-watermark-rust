@@ -7,7 +7,7 @@ A Rust library for blind image watermarking using DWT (Discrete Wavelet Transfor
 - **Blind Watermarking**: Extract the watermark without needing the original image.
 - **Robust Algorithm**: Combines DWT, DCT, and SVD for embedding watermarks in the frequency domain.
 - **High Performance**: Developed in Rust, leveraging the `faer` crate for efficient matrix computations and `rayon` for multi-threading support.
-- **Flexible**: Supports embedding arbitrary binary data.
+- **Flexible**: Supports embedding arbitrary binary data (e.g. `Vec<u8>`). String watermarking is natively supported.
 - **Random Strategy**: Supports randomized block selection for embedding watermarks, enhancing security.
 - **High-Level API**: Provides a fluent builder-like API for easy integration.
 
@@ -31,15 +31,15 @@ blind_watermark = "0.1.0"
 ### Embedding a Watermark
 
 ```rust
-use bitvec::prelude::*;
 use blind_watermark::prelude::*;
 
+
 fn main() {
-    let example = "tests/example.jpg";
-    let processed = "tests/processed.png";
-    let watermark = bitvec![0, 1, 0, 1];
+    let example = "example.jpg";
+    let processed = "processed.png";
+    let watermark = "こんにちは❗😊";
     let seed = Some(0);
-    embed_watermark(example, processed, watermark.clone(), seed).unwrap();
+    embed_watermark_string(example, processed, watermark, seed).unwrap();
 }
 ```
 
@@ -94,13 +94,12 @@ To extract the watermark, you only need the watermarked image and the length of 
 
 ```rust
 use blind_watermark::prelude::*;
-use image::ImageReader;
 
 fn main() {
-    let processed = "tests/processed.png";
-    let watermark_len = 4;
+    let processed = "processed.png";
+    let watermark_len = get_wm_len("こんにちは❗😊".as_bytes());
     let seed = Some(0);
-    let extracted = extract_watermark(processed, watermark_len, seed).unwrap();
+    let extracted = extract_watermark_string(processed, watermark_len, seed).unwrap();
     println!("Extracted bits: {:?}", extracted);
 }
 ```

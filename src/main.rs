@@ -1,18 +1,9 @@
-use bitvec::prelude::*;
+use blind_watermark::prelude::*;
 
 fn main() {
-    let a: String = String::from("こんにちは❗😊");
-    eprintln!("a = {:?}", a);
-    let a_bytes: &[u8] = a.as_bytes();
-    eprintln!("a_bytes = {:?}", a_bytes);
-    let bv = a_bytes.as_bits::<Lsb0>();
-    for i in 0..10 {
-        eprintln!("bv[i] = {:?}", bv[i]);
-    }
-    let r_bytes: Vec<u8> = bv.to_bitvec().into_vec();
-    let b = String::from_utf8(r_bytes);
-    eprintln!("b = {:?}", b);
-
-
-
+    let processed = "processed.png";
+    let watermark_len = get_wm_len("こんにちは❗😊".as_bytes());
+    let seed = Some(0);
+    let extracted = extract_watermark_string(processed, watermark_len, seed).unwrap();
+    println!("Extracted bits: {:?}", extracted);
 }
