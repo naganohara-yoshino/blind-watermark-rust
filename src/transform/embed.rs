@@ -46,44 +46,47 @@ impl BlockCutted {
         }
     }
 
-    /// Extract watermark bits with 3-channel majority voting
+    /// Extract watermark bits using 3-channel majority voting (parallelized and optimized)
     pub fn extract_watermark_bits(self, wm_len: usize, config: &WatermarkConfig) -> BitVec {
         let nblocks = self.blocks_dimensions.0 * self.blocks_dimensions.1;
 
         assert!(wm_len > 0, "wm_len cannot be zero");
         assert!(nblocks > 0);
 
-        // Each block gives one bit from each channel
-        let mut y_bits = Vec::with_capacity(nblocks);
-        let mut cb_bits = Vec::with_capacity(nblocks);
-        let mut cr_bits = Vec::with_capacity(nblocks);
+        // 1. Parallel extraction of block bits for Y, Cb and Cr.
+        let block_bits: Vec<_> = (0..nblocks)
+            .into_par_iter()
+            .map(|i| {
+                (
+                    self.y_ll_blocks[i].extract_bit(config),
+                    self.cb_ll_blocks[i].extract_bit(config),
+                    self.cr_ll_blocks[i].extract_bit(config),
+                )
+            })
+            .collect();
 
-        for i in 0..nblocks {
-            y_bits.push(self.y_ll_blocks[i].extract_bit(config));
-            cb_bits.push(self.cb_ll_blocks[i].extract_bit(config));
-            cr_bits.push(self.cr_ll_blocks[i].extract_bit(config));
-        }
+        // 2. Parallel majority voting for each watermark bit.
+        (0..wm_len)
+            .into_par_iter()
+            .map(|i| {
+                let mut sum = 0u32;
+                let mut count = 0u32;
 
-        let mut final_bits = BitVec::with_capacity(wm_len);
-        for i in 0..wm_len {
-            // gather bits from all blocks that correspond to this watermark index
-            let mut sum = 0u32;
-            let mut count = 0u32;
+                // Iterate over blocks corresponding to this watermark bit
+                let mut j = i;
+                while j < nblocks {
+                    let (y, cb, cr) = block_bits[j];
+                    sum += y as u32 + cb as u32 + cr as u32;
+                    count += 3;
+                    j += wm_len;
+                }
 
-            let mut j = i;
-            while j < nblocks {
-                // majority over Y/Cb/Cr for this block
-                let block_sum = y_bits[j] as u8 + cb_bits[j] as u8 + cr_bits[j] as u8;
-                sum += block_sum as u32;
-                count += 3;
-                j += wm_len;
-            }
-
-            // final recovered bit
-            final_bits.push(sum * 2 >= count); // average > 0.5
-        }
-
-        final_bits
+                // Majority voting: return true if average >= 0.5
+                sum * 2 >= count
+            })
+            .collect::<Vec<bool>>()
+            .into_iter()
+            .collect()
     }
 }
 
