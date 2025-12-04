@@ -61,6 +61,6 @@ pub fn embed_watermark(
         .remove_padding();
     let processed_image: Rgba32FImage = processed.into();
     let output_image: DynamicImage = processed_image.into();
-    output_image.to_rgb8().save(img_output_path).unwrap();
+    output_image.to_rgb8().save(img_output_path)?;
     Ok(())
 }
