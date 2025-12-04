@@ -7,6 +7,8 @@ const BLOCK_SIZE: usize = 4;
 pub mod config;
 pub mod prelude;
 pub mod transform;
+
+#[derive(Clone, Debug)]
 pub struct YCrBrAMat {
     pub y: Mat<f32>,
     pub cb: Mat<f32>,
@@ -16,6 +18,7 @@ pub struct YCrBrAMat {
     pub dimensions: (usize, usize),
 }
 
+#[derive(Clone, Debug)]
 pub struct PaddedYCrBrAMat {
     pub y: Mat<f32>,
     pub cb: Mat<f32>,
@@ -25,6 +28,7 @@ pub struct PaddedYCrBrAMat {
     pub original_dimensions: (usize, usize),
 }
 
+#[derive(Clone, Debug)]
 pub struct DwtedYCrBrAMat {
     ///(LL, HL, LH, HH)
     pub y: (Mat<f32>, Mat<f32>, Mat<f32>, Mat<f32>),
@@ -37,7 +41,7 @@ pub struct DwtedYCrBrAMat {
     /// (height, width),
     pub original_dimensions: (usize, usize),
 }
-
+#[derive(Clone, Debug)]
 pub struct BlockCutted {
     // Take LL part only
     pub y_ll_blocks: Vec<Block>,
@@ -67,6 +71,7 @@ pub struct Block {
     //pub index: usize,
 }
 
+#[derive(Clone, Debug)]
 pub struct Imbedded {
     // Take LL part only
     pub y_ll_blocks: Vec<Block>,
@@ -88,6 +93,7 @@ pub struct Imbedded {
     pub blocks_dimensions: (usize, usize),
 }
 
+#[derive(Clone, Debug)]
 pub struct AssembledYCrBrAMat {
     ///(LL, HL, LH, HH)
     pub y: (Mat<f32>, Mat<f32>, Mat<f32>, Mat<f32>),

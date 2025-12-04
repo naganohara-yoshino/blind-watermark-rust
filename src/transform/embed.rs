@@ -1,7 +1,7 @@
 use crate::{
-    Block, BlockCutted, Imbedded,
     config::WatermarkConfig,
     transform::dct::{dct2_2d, dct3_2d},
+    Block, BlockCutted, Imbedded,
 };
 use bitvec::prelude::*;
 
@@ -44,11 +44,10 @@ impl BlockCutted {
     }
 
     /// Extract watermark bits with 3-channel majority voting
-    pub fn extract_watermark_bits(self, wm_shape_len: usize, config: &WatermarkConfig) -> BitVec {
-        let wm_len = wm_shape_len;
+    pub fn extract_watermark_bits(self, wm_len: usize, config: &WatermarkConfig) -> BitVec {
         let nblocks = self.blocks_dimensions.0 * self.blocks_dimensions.1;
 
-        assert!(wm_len > 0, "wm_shape_len cannot be zero");
+        assert!(wm_len > 0, "wm_len cannot be zero");
         assert!(nblocks > 0);
 
         // Each block gives one bit from each channel

@@ -175,7 +175,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "blind-watermark"
+name = "blind_watermark"
 version = "0.1.0"
 dependencies = [
  "anyhow",

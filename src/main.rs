@@ -1,6 +1,6 @@
 use bitvec::prelude::*;
 use blind_watermark::prelude::*;
-use image::{DynamicImage, ImageReader, RgbImage, Rgba32FImage};
+use image::{DynamicImage, ImageReader, Rgba32FImage};
 fn main() {
     let img = ImageReader::open("example.jpg")
         .unwrap()
