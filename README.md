@@ -38,7 +38,7 @@ fn main() {
     let example = "tests/example.jpg";
     let processed = "tests/processed.png";
     let watermark = bitvec![0, 1, 0, 1];
-    let seed = 0;
+    let seed = Some(0);
     embed_watermark(example, processed, watermark.clone(), seed).unwrap();
 }
 ```
@@ -99,7 +99,7 @@ use image::ImageReader;
 fn main() {
     let processed = "tests/processed.png";
     let watermark_len = 4;
-    let seed = 0;
+    let seed = Some(0);
     let extracted = extract_watermark(processed, watermark_len, seed).unwrap();
     println!("Extracted bits: {:?}", extracted);
 }
