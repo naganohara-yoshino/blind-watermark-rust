@@ -1,6 +1,6 @@
 use crate::{
     config::{WatermarkConfig, WatermarkMode},
-    quantization::{embed_quantization, extract_quantization, average_value},
+    quantization::{average_value, embed_quantization, extract_quantization},
     strategy::Permutation,
     transform::dct::{dct2_2d, dct3_2d},
     Block, BlockCutted, Imbedded,
@@ -13,7 +13,7 @@ impl BlockCutted {
     /// Embed watermark bits into blocks (Y, Cb, Cr)
     pub fn embed_watermark_bits(
         self,
-        watermark_bits: BitVec,
+        watermark_bits: &BitSlice<u8>,
         config: &WatermarkConfig,
     ) -> Imbedded {
         let wm_len = watermark_bits.len();
@@ -57,7 +57,7 @@ impl BlockCutted {
     }
 
     /// Extract watermark bits using 3-channel majority voting (parallelized and optimized)
-    pub fn extract_watermark_bits(self, wm_len: usize, config: &WatermarkConfig) -> BitVec {
+    pub fn extract_watermark_bits(self, wm_len: usize, config: &WatermarkConfig) -> BitVec<u8> {
         let nblocks = self.blocks_dimensions.0 * self.blocks_dimensions.1;
 
         assert!(wm_len > 0, "wm_len cannot be zero");
@@ -87,8 +87,7 @@ impl BlockCutted {
         (0..wm_len)
             // .into_par_iter()
             .map(|i| {
-                let corresponding_block_positions = perm
-                    .corresponding_block_positions(i, wm_len);
+                let corresponding_block_positions = perm.corresponding_block_positions(i, wm_len);
 
                 // Sum over the possible blocks corresponding to this watermark bit `i`
                 let total = corresponding_block_positions
@@ -151,13 +150,11 @@ impl Block {
         match config.strength_2 {
             None => extract_quantization(singular[0], strength_1),
             Some(strength_2) => {
-            let first = extract_quantization(singular[0], strength_1);
-            let second = extract_quantization(singular[1], strength_2);
-            average_value(first, second)
+                let first = extract_quantization(singular[0], strength_1);
+                let second = extract_quantization(singular[1], strength_2);
+                average_value(first, second)
+            }
         }
-    }
-        
-        
     }
 }
 
