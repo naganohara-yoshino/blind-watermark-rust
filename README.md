@@ -33,6 +33,21 @@ blind_watermark = "0.1.0"
 ```rust
 use bitvec::prelude::*;
 use blind_watermark::prelude::*;
+
+fn main() {
+    let example = "tests/example.jpg";
+    let processed = "tests/processed.png";
+    let watermark = bitvec![0, 1, 0, 1];
+    let seed = 0;
+    embed_watermark(example, processed, watermark.clone(), seed).unwrap();
+}
+```
+
+OR
+
+```rust
+use bitvec::prelude::*;
+use blind_watermark::prelude::*;
 use image::{DynamicImage, ImageReader, Rgba32FImage};
 
 fn main() {
@@ -76,6 +91,21 @@ fn main() {
 ### Extracting a Watermark
 
 To extract the watermark, you only need the watermarked image and the length of the watermark.
+
+```rust
+use blind_watermark::prelude::*;
+use image::ImageReader;
+
+fn main() {
+    let processed = "tests/processed.png";
+    let watermark_len = 4;
+    let seed = 0;
+    let extracted = extract_watermark(processed, watermark_len, seed).unwrap();
+    println!("Extracted bits: {:?}", extracted);
+}
+```
+
+OR
 
 ```rust
 use bitvec::prelude::*;
