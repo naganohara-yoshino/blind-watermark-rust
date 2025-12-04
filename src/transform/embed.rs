@@ -23,7 +23,9 @@ impl BlockCutted {
         let (y_ll_blocks, cb_ll_blocks, cr_ll_blocks) = (0..nblocks)
             .into_par_iter()
             .map(|i| {
-                let bit = watermark_bits[config.mode.corresponding_wmbits_position(i, wm_len)];
+                let bit = watermark_bits[config
+                    .mode
+                    .corresponding_wmbits_position(i, wm_len, nblocks)];
                 (
                     self.y_ll_blocks[i].imbed_bit(bit, config),
                     self.cb_ll_blocks[i].imbed_bit(bit, config),

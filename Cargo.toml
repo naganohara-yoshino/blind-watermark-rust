@@ -1,13 +1,13 @@
 [package]
 name = "blind_watermark"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 description = "Picture blind watermarking library."
 license = "MIT OR Apache-2.0"
 authors = ["Naganohara Yoshino <naganohara-yoshino@outlook.com>"]
 homepage = "https://github.com/naganohara-yoshino/blind-watermark-rust"
 repository = "https://github.com/naganohara-yoshino/blind-watermark-rust"
-# documentation = "https://docs.rs/blind_watermark"
+documentation = "https://docs.rs/blind_watermark"
 readme = "README.md"
 keywords = ["watermark", "image", "blind-watermark", "steganography"]
 categories = ["multimedia::images", "algorithms"]

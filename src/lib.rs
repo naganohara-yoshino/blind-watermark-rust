@@ -8,6 +8,7 @@ pub mod prelude;
 pub(crate) mod quantization;
 pub mod strategy;
 pub mod transform;
+pub mod utils;
 
 use faer::prelude::*;
 const BLOCK_SIZE: usize = 4;

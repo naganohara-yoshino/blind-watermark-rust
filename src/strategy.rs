@@ -18,13 +18,18 @@ impl Permutation {
 }
 
 impl WatermarkMode {
-    pub fn corresponding_wmbits_position(&self, block_position: usize, wm_len: usize) -> usize {
+    pub fn corresponding_wmbits_position(
+        &self,
+        block_position: usize,
+        wm_len: usize,
+        nblocks: usize,
+    ) -> usize {
         match self {
             // Cycling corresponding watermark bits
             WatermarkMode::Normal => block_position % wm_len,
             // Using Permutation
             WatermarkMode::Strategy(seed) => {
-                Permutation::new(wm_len, *seed).f[block_position] % wm_len
+                Permutation::new(nblocks, *seed).f[block_position] % wm_len
             }
         }
     }
@@ -42,7 +47,7 @@ impl WatermarkMode {
                 .collect(),
             // Using Permutation
             WatermarkMode::Strategy(seed) => (0..nblocks)
-                .filter(|&i| Permutation::new(wm_len, seed).f[i] % wm_len == wmbits_position)
+                .filter(|&i| Permutation::new(nblocks, seed).f[i] % wm_len == wmbits_position)
                 .collect(),
         }
     }
