@@ -70,7 +70,7 @@ impl DwtedYCrBrAMat {
 }
 
 /// Single-level 2D Haar DWT: direct 2x2 block, returns (LL, HL, LH, HH)
-pub fn haar_dwt_2d<T: Float + ComplexField + Send + Sync>(
+fn haar_dwt_2d<T: Float + ComplexField + Send + Sync>(
     mat: MatRef<T>,
 ) -> (Mat<T>, Mat<T>, Mat<T>, Mat<T>) {
     let (rows, cols) = mat.shape();
@@ -104,7 +104,7 @@ pub fn haar_dwt_2d<T: Float + ComplexField + Send + Sync>(
 }
 
 /// Inverse transform: Reconstruct original matrix from (LL, HL, LH, HH)
-pub fn haar_idwt_2d<T: Float + ComplexField + Send + Sync>(
+fn haar_idwt_2d<T: Float + ComplexField + Send + Sync>(
     ll: MatRef<T>,
     hl: MatRef<T>,
     lh: MatRef<T>,

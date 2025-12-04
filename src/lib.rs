@@ -2,11 +2,15 @@
 //! The transform pipeline is as follows (io ignored):
 //! Embed : PaddedYCrBrAMat -(dwt)->DwtedYCrBrAMat -(cut)-> BlockCutted -(black embed)-> Imbedded -(assemble)-> AssembledYCrBrAMat -(idwt)-> PaddedYCrBrAMat
 //! Extract : PaddedYCrBrAMat -(dwt)->DwtedYCrBrAMat -(cut)-> BlockCutted, and we can read from Blocks
-use faer::prelude::*;
-const BLOCK_SIZE: usize = 4;
+
 pub mod config;
 pub mod prelude;
+pub(crate) mod quantization;
+pub mod strategy;
 pub mod transform;
+
+use faer::prelude::*;
+const BLOCK_SIZE: usize = 4;
 
 #[derive(Clone, Debug)]
 pub struct YCrBrAMat {

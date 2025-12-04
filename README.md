@@ -6,7 +6,7 @@ A Rust library for blind image watermarking using DWT (Discrete Wavelet Transfor
 
 - **Blind Watermarking**: Extract the watermark without needing the original image.
 - **Robust Algorithm**: Combines DWT, DCT, and SVD for embedding watermarks in the frequency domain.
-- **High Performance**: Built with Rust and uses the `faer` crate for efficient matrix computations.
+- **High Performance**: Developed in Rust, leveraging the `faer` crate for efficient matrix computations and `rayon` for multi-threading support.
 - **Flexible**: Supports embedding arbitrary binary data.
 
 ### Original Image

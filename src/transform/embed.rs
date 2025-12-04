@@ -1,5 +1,6 @@
 use crate::{
     config::WatermarkConfig,
+    quantization::{embed_quantization, extract_quantization},
     transform::dct::{dct2_2d, dct3_2d},
     Block, BlockCutted, Imbedded,
 };
@@ -22,7 +23,7 @@ impl BlockCutted {
         let (y_ll_blocks, cb_ll_blocks, cr_ll_blocks) = (0..nblocks)
             .into_par_iter()
             .map(|i| {
-                let bit = watermark_bits[i % wm_len];
+                let bit = watermark_bits[config.mode.corresponding_wmbits_position(i, wm_len)];
                 (
                     self.y_ll_blocks[i].imbed_bit(bit, config),
                     self.cb_ll_blocks[i].imbed_bit(bit, config),
@@ -53,7 +54,7 @@ impl BlockCutted {
         assert!(wm_len > 0, "wm_len cannot be zero");
         assert!(nblocks > 0);
 
-        // 1. Parallel extraction of block bits for Y, Cb and Cr.
+        // 1. Parallel extraction of bits for Y, Cb and Cr at each block position `i`.
         let block_bits: Vec<_> = (0..nblocks)
             .into_par_iter()
             .map(|i| {
@@ -65,28 +66,31 @@ impl BlockCutted {
             })
             .collect();
 
-        // 2. Parallel majority voting for each watermark bit.
+        // 2. Parallel majority voting for deciding each watermark bit at bitvec position `i`.
         (0..wm_len)
             .into_par_iter()
             .map(|i| {
-                let mut sum = 0u32;
-                let mut count = 0u32;
+                let corresponding_block_positions = config
+                    .mode
+                    .corresponding_block_positions(i, wm_len, nblocks);
 
-                // Iterate over blocks corresponding to this watermark bit
-                let mut j = i;
-                while j < nblocks {
-                    let (y, cb, cr) = block_bits[j];
-                    sum += y as u32 + cb as u32 + cr as u32;
-                    count += 3;
-                    j += wm_len;
-                }
+                // Sum over the possible blocks corresponding to this watermark bit `i`
+                let total = corresponding_block_positions
+                    .iter()
+                    .map(|&j| {
+                        block_bits[j].0 as usize
+                            + block_bits[j].1 as usize
+                            + block_bits[j].2 as usize
+                    })
+                    .sum::<usize>();
+                let count = corresponding_block_positions.len() * 3;
 
-                // Majority voting: return true if average >= 0.5
-                sum * 2 >= count
+                // Majority voting: return true if most of the corresponding value is `true`, vice versa.
+                total * 2 >= count
             })
             .collect::<Vec<bool>>()
             .into_iter()
-            .collect()
+            .collect() // Convert to `BitVec
     }
 }
 
@@ -127,24 +131,11 @@ impl Block {
     }
 }
 
-/// Quantizes a singular value based on the bit and strength
-fn embed_quantization(target: f32, bit: bool, strength: i32) -> f32 {
-    let target = target * 255.0;
-    let f_strength = strength as f32;
-    (((target / f_strength).floor() + if bit { 3.0 / 4.0 } else { 1.0 / 4.0 }) * f_strength) / 255.0
-}
-
-/// Extracts the bit from a singular value using the quantization strength
-fn extract_quantization(target: f32, strength: i32) -> bool {
-    let target = target * 255.0;
-    let f_strength = strength as f32;
-    target % f_strength > f_strength / 2.0
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
-    use faer::prelude::*; // Assuming faer_core for matrix creation
+    use crate::config::{WatermarkConfig, WatermarkConfigBuilder, WatermarkMode};
+    use faer::prelude::*;
 
     /// Helper to create a simple test Block
     fn create_test_block() -> Block {
@@ -154,10 +145,17 @@ mod tests {
         }
     }
 
+    fn create_test_config() -> WatermarkConfig {
+        WatermarkConfigBuilder::default()
+            .mode(WatermarkMode::Strategy(0))
+            .build()
+            .unwrap()
+    }
+
     #[test]
     fn test_embed_extract_bit_true() {
         let block = create_test_block();
-        let config = WatermarkConfig::default();
+        let config = create_test_config();
 
         // Embed a true bit
         let watermarked = block.imbed_bit(true, &config);
@@ -171,7 +169,7 @@ mod tests {
     #[test]
     fn test_embed_extract_bit_false() {
         let block = create_test_block();
-        let config = WatermarkConfig::default();
+        let config = create_test_config();
 
         // Embed a false bit
         let watermarked = block.imbed_bit(false, &config);
