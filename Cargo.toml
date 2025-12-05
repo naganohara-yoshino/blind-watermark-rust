@@ -10,14 +10,7 @@ homepage = "https://github.com/naganohara-yoshino/blind-watermark-rust"
 repository = "https://github.com/naganohara-yoshino/blind-watermark-rust"
 documentation = "https://docs.rs/blind_watermark"
 readme = "README.md"
-keywords = [
-    "watermark",
-    "image",
-    "blind-watermark",
-    "steganography",
-    "cli",
-    "utility",
-]
+keywords = ["watermark", "image", "blind-watermark", "steganography", "cli"]
 categories = ["multimedia::images", "algorithms"]
 
 [dependencies]
