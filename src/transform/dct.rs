@@ -19,15 +19,14 @@ pub fn dct3_2d(mat: MatRef<f32>) -> Mat<f32> {
 
 /// Generate a normalized DCT matrix of size n x n
 fn dct_mat_normalized(n: usize) -> Mat<f32> {
-    let dct_mat = Mat::from_fn(n, n, |r, c| {
+    Mat::from_fn(n, n, |r, c| {
         let i = r as f32;
         let j = c as f32;
         match r {
             0 => f32::cos(PI / (n as f32) * i * (j + 0.5)) * f32::sqrt(1.0 / n as f32),
             _ => f32::cos(PI / (n as f32) * i * (j + 0.5)) * f32::sqrt(2.0 / n as f32),
         }
-    });
-    dct_mat
+    })
 }
 
 #[cfg(test)]

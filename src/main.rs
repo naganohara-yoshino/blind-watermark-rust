@@ -1,6 +1,7 @@
 use anyhow::Result;
 use blind_watermark::prelude::*;
 use clap::{ArgGroup, Args, Parser, Subcommand};
+use colored::Colorize;
 use ignore::WalkBuilder;
 use indicatif::{ProgressBar, ProgressStyle};
 use rayon::prelude::*;
@@ -17,7 +18,7 @@ fn main() {
 
 /// Watermark CLI tool
 #[derive(Parser, Debug)]
-#[command(name = "watermark", version, about)]
+#[command(name = "watermark", version, about, author)]
 pub struct Cli {
     #[command(subcommand)]
     pub command: Commands,
@@ -56,7 +57,7 @@ pub struct EmbedArgs {
     pub prefix: Option<String>,
 
     /// Optional seed
-    #[arg(short, long)]
+    #[arg(long)]
     pub seed: Option<u64>,
 
     /// Recursively scan directory
@@ -120,10 +121,9 @@ fn run_embed(args: EmbedArgs) {
             .collect();
 
         let pb = ProgressBar::new(files.len() as u64);
-        let style =
-            ProgressStyle::with_template("Embedding [{bar:60.cyan/blue}] {pos}/{len} ({eta})")
-                .unwrap()
-                .progress_chars("#> ");
+        let style = ProgressStyle::with_template("   Embedding [{bar:50}] {pos}/{len} ({eta})")
+            .unwrap()
+            .progress_chars("=> ");
         pb.set_style(style);
 
         let prefix = args
@@ -143,14 +143,18 @@ fn run_embed(args: EmbedArgs) {
                 .to_str()
                 .expect("illformed input");
             let output = input.with_file_name(format!("{}{}.{}", prefix, stem, ext));
-            pb.println(format!("Embedding {}", input.display()));
+            pb.println(format!(
+                "   {} {}",
+                "Embedding".green().bold(),
+                input.display()
+            ));
             // Run embed
             embed_watermark_string(input, &output, &args.string, args.seed).unwrap();
 
             pb.inc(1);
         });
-
-        pb.finish_with_message("Done");
+        pb.finish_and_clear();
+        println!("{}", "    Done embedding.".yellow().bold());
     }
 }
 
@@ -158,5 +162,5 @@ fn run_extract(args: ExtractArgs) {
     let extracted = extract_watermark_string(args.input, args.length, args.seed)
         .expect("Failed to extract watermark");
 
-    println!("Extracted watermark: {}", extracted);
+    println!("    {} {}", "Extracted".yellow().bold(), extracted);
 }
