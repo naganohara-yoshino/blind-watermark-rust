@@ -33,7 +33,7 @@ cargo install blind_watermark
 You can get help by running:
 
 ```sh
-watermark --help
+blind_watermark --help
 ```
 
 ### Library
