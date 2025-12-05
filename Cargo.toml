@@ -11,7 +11,7 @@ repository = "https://github.com/naganohara-yoshino/blind-watermark-rust"
 documentation = "https://docs.rs/blind_watermark"
 readme = "README.md"
 keywords = ["watermark", "image", "blind-watermark", "steganography"]
-categories = ["multimedia::images", "algorithms", "cli", "utility"]
+categories = ["multimedia::images", "algorithms", "cli"]
 
 [dependencies]
 indicatif = "0.18"
