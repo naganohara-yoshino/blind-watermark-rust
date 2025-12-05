@@ -14,7 +14,8 @@ keywords = ["watermark", "image", "blind-watermark", "steganography"]
 categories = ["multimedia::images", "algorithms", "cli", "utility"]
 
 [dependencies]
-indicatif =  version = "0.18" anyhow = "1"
+indicatif = "0.18"
+anyhow = "1"
 faer = "0.23"
 image = "0.25"
 num = "0.4"
