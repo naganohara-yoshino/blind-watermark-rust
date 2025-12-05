@@ -1,29 +1,30 @@
 use anyhow::Result;
 use bitvec::prelude::*;
 use image::{DynamicImage, ImageReader, Rgba32FImage};
+use std::path::Path;
 
 use crate::{
-    config::{WatermarkConfig, WatermarkConfigBuilder, WatermarkMode},
     YCrBrAMat,
+    config::{WatermarkConfig, WatermarkConfigBuilder, WatermarkMode},
 };
 
 /// Extracts a watermark from an image using the specified strategy.
 ///
 /// # Arguments
 ///
-/// * `img_path` - Path to the watermarked image.
+/// * `img_in` - Path to the watermarked image.
 /// * `wm_len` - Length of the watermark in bits.
 /// * `seed` - Seed used for the random strategy during embedding.
 ///
 /// # Returns
 ///
 /// The extracted watermark as a `BitVec`.
-pub fn extract_watermark_bits(
-    img_path: &str,
+pub fn extract_watermark_bits<T: AsRef<Path>>(
+    img_in: T,
     wm_len: usize,
     seed: Option<u64>,
 ) -> Result<BitVec<u8>> {
-    let img = ImageReader::open(img_path)?.decode()?.into_rgba32f();
+    let img = ImageReader::open(img_in)?.decode()?.into_rgba32f();
 
     let ycbcr: YCrBrAMat = img.into();
 
@@ -45,17 +46,17 @@ pub fn extract_watermark_bits(
 ///
 /// # Arguments
 ///
-/// * `img_path` - Path to the input image.
-/// * `img_output_path` - Path to save the watermarked image.
+/// * `img_in` - Path to the input image.
+/// * `img_out` - Path to save the watermarked image.
 /// * `watermark` - The watermark bits to embed.
 /// * `seed` - Seed for the random strategy.
-pub fn embed_watermark_bits(
-    img_path: &str,
-    img_output_path: &str,
+pub fn embed_watermark_bits<T: AsRef<Path>>(
+    img_in: T,
+    img_out: T,
     watermark: &BitSlice<u8>,
     seed: Option<u64>,
 ) -> Result<()> {
-    let img = ImageReader::open(img_path)?.decode()?.into_rgba32f();
+    let img = ImageReader::open(img_in)?.decode()?.into_rgba32f();
     let ycbcr: YCrBrAMat = img.into();
     let config = match seed {
         None => WatermarkConfig::default(),
@@ -74,7 +75,7 @@ pub fn embed_watermark_bits(
         .remove_padding();
     let processed_image: Rgba32FImage = processed.into();
     let output_image: DynamicImage = processed_image.into();
-    output_image.to_rgb8().save(img_output_path)?;
+    output_image.to_rgb8().save(img_out)?;
     Ok(())
 }
 
@@ -82,18 +83,18 @@ pub fn embed_watermark_bits(
 ///
 /// # Arguments
 ///
-/// * `img_path` - Path to the input image.
-/// * `img_output_path` - Path to save the watermarked image.
+/// * `img_in` - Path to the input image.
+/// * `img_out` - Path to save the watermarked image.
 /// * `watermark` - The watermark bits to embed.
 /// * `seed` - Seed for the random strategy.
-pub fn embed_watermark_bytes(
-    img_path: &str,
-    img_output_path: &str,
+pub fn embed_watermark_bytes<T: AsRef<Path>>(
+    img_in: T,
+    img_out: T,
     watermark: &[u8],
     seed: Option<u64>,
 ) -> Result<()> {
     let bv = watermark.as_bits::<Lsb0>();
-    embed_watermark_bits(img_path, img_output_path, bv, seed)?;
+    embed_watermark_bits(img_in, img_out, bv, seed)?;
     Ok(())
 }
 
@@ -105,15 +106,15 @@ pub fn get_wm_len(watermark: &[u8]) -> usize {
 ///
 /// # Arguments
 ///
-/// * `img_path` - Path to the watermarked image.
+/// * `img_in` - Path to the watermarked image.
 /// * `wm_len` - Length of the watermark in bits.
 /// * `seed` - Seed used for the random strategy during embedding.
-pub fn extract_watermark_bytes(
-    img_path: &str,
+pub fn extract_watermark_bytes<T: AsRef<Path>>(
+    img_in: T,
     wm_len: usize,
     seed: Option<u64>,
 ) -> Result<Vec<u8>> {
-    let bv = extract_watermark_bits(img_path, wm_len, seed)?;
+    let bv = extract_watermark_bits(img_in, wm_len, seed)?;
     Ok(bv.into_vec())
 }
 
@@ -121,15 +122,15 @@ pub fn extract_watermark_bytes(
 ///
 /// # Arguments
 ///
-/// * `img_path` - Path to the watermarked image.
+/// * `img_in` - Path to the watermarked image.
 /// * `wm_len` - Length of the watermark in bits.
 /// * `seed` - Seed used for the random strategy during embedding.
-pub fn extract_watermark_string(
-    img_path: &str,
+pub fn extract_watermark_string<T: AsRef<Path>>(
+    img_in: T,
     wm_len: usize,
     seed: Option<u64>,
 ) -> Result<String> {
-    let bytes = extract_watermark_bytes(img_path, wm_len, seed)?;
+    let bytes = extract_watermark_bytes(img_in, wm_len, seed)?;
     let s = String::from_utf8(bytes)?;
     Ok(s)
 }
@@ -138,16 +139,16 @@ pub fn extract_watermark_string(
 ///
 /// # Arguments
 ///
-/// * `img_path` - Path to the input image.
-/// * `img_output_path` - Path to save the watermarked image.
+/// * `img_in` - Path to the input image.
+/// * `img_out` - Path to save the watermarked image.
 /// * `watermark` - The watermark bits to embed.
 /// * `seed` - Seed for the random strategy.
-pub fn embed_watermark_string(
-    img_path: &str,
-    img_output_path: &str,
+pub fn embed_watermark_string<T: AsRef<Path>>(
+    img_in: T,
+    img_out: T,
     watermark: &str,
     seed: Option<u64>,
 ) -> Result<()> {
     let bytes = watermark.as_bytes();
-    embed_watermark_bytes(img_path, img_output_path, bytes, seed)
+    embed_watermark_bytes(img_in, img_out, bytes, seed)
 }

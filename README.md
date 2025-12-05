@@ -1,6 +1,6 @@
 # Blind Watermark
 
-A Rust library for blind image watermarking using DWT (Discrete Wavelet Transform), DCT (Discrete Cosine Transform), and SVD (Singular Value Decomposition). The algorithm is originally implemented in python by *Guo Fei* at [this repository](https://github.com/guofei9987/blind_watermark/). This is the rust rewritten version.
+A Rust library and CLI tool for blind image watermarking using DWT (Discrete Wavelet Transform), DCT (Discrete Cosine Transform), and SVD (Singular Value Decomposition). The algorithm is originally implemented in python by *Guo Fei* at [this repository](https://github.com/guofei9987/blind_watermark/). This is the rust rewritten and modified version.
 
 ## Features
 
@@ -9,7 +9,7 @@ A Rust library for blind image watermarking using DWT (Discrete Wavelet Transfor
 - **High Performance**: Developed in Rust, leveraging the `faer` crate for efficient matrix computations and `rayon` for multi-threading support.
 - **Flexible**: Supports embedding arbitrary binary data (e.g. `Vec<u8>`). String watermarking is natively supported.
 - **Random Strategy**: Supports randomized block selection for embedding watermarks, enhancing security.
-- **High-Level API**: Provides a fluent API for easy integration.
+- **CLI Tool**: A command-line interface for easy embedding and extracting watermarks.
 
 ### Original Image
 ![Original](/tests/example.jpg)
@@ -19,20 +19,34 @@ A Rust library for blind image watermarking using DWT (Discrete Wavelet Transfor
 
 ## Installation
 
-Add this to your `Cargo.toml`:
+Pre-Compiled Binaries are available at [GitHub Releases](https://github.com/naganohara-yoshino/blind-watermark-rust/releases/latest).
+If you want to install from source, use:
 
-```toml
-[dependencies]
-blind_watermark = "0.1.0"
+```sh
+cargo install blind_watermark
 ```
 
 ## Usage
 
+### CLI
+
+You can get help by running:
+
+```sh
+watermark --help
+```
+
+### Library
+
+Add this to your `Cargo.toml`:
+```toml
+[dependencies]
+blind_watermark = "0.1"
+```
 ### Embedding a Watermark
 
 ```rust
 use blind_watermark::prelude::*;
-
 
 fn main() {
     let example = "example.jpg";
@@ -47,7 +61,6 @@ OR
 
 ```rust
 use bitvec::prelude::*;
-use blind_watermark::prelude::*;
 use image::{DynamicImage, ImageReader, Rgba32FImage};
 
 fn main() {
@@ -62,8 +75,8 @@ fn main() {
     let ycbcr: YCrBrAMat = img.into();
 
     // 3. Define watermark (bits)
-    let watermark = bitvec![0, 1, 0, 1, 1, 0, 1, 0]; // Example bits
-    
+    let watermark = bits![u8, Lsb0; 0, 1, 0, 1, 1, 0, 1, 0]; // Example bits
+
     // 4. Configure watermark settings (Optional)
     let config = WatermarkConfigBuilder::default()
         .strength_1(36)
@@ -120,14 +133,14 @@ fn main() {
         .into_rgba32f();
 
     let ycbcr: YCrBrAMat = img.into();
-    
+
     // 2. Use the same config as embedding
     let config = WatermarkConfigBuilder::default()
         .strength_1(36)
         .mode(WatermarkMode::Strategy(12345))
         .build()
         .unwrap();
-        
+
     let watermark_len = 8; // Length of the embedded watermark
 
     // 3. Process pipeline: Padding -> DWT -> Cut Blocks -> Extract
@@ -138,7 +151,6 @@ fn main() {
         .extract_watermark_bits(watermark_len, &config);
 
     println!("Extracted bits: {:?}", extracted_bits);
-}
 ```
 
 ## Algorithm Details
