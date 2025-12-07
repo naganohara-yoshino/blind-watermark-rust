@@ -167,9 +167,7 @@ mod tests {
     /// Helper to create a simple test Block
     fn create_test_block() -> Block {
         let data = Mat::<f32>::full(4, 4, 1.0);
-        Block {
-            mat_data: data.into(),
-        }
+        Block { mat_data: data }
     }
 
     fn create_test_config() -> WatermarkConfig {
