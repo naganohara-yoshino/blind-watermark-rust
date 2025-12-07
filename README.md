@@ -19,8 +19,13 @@ A Rust library and CLI tool for blind image watermarking using DWT (Discrete Wav
 
 ## Installation
 
-Pre-Compiled Binaries are available at [GitHub Releases](https://github.com/naganohara-yoshino/blind-watermark-rust/releases/latest).
-If you want to install from source, use:
+Add this to your `Cargo.toml`:
+```toml
+[dependencies]
+blind_watermark = "0.1"
+```
+
+As for the CLI tool, pre-compiled binaries are available at [GitHub Releases](https://github.com/naganohara-yoshino/blind-watermark-rust/releases/latest). If you have Rust toolchain installed and want to install from source, use:
 
 ```sh
 cargo install blind_watermark
@@ -38,11 +43,6 @@ blind_watermark --help
 
 ### Library
 
-Add this to your `Cargo.toml`:
-```toml
-[dependencies]
-blind_watermark = "0.1"
-```
 ### Embedding a Watermark
 
 ```rust
