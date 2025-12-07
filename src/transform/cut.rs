@@ -1,4 +1,4 @@
-use crate::{Block, BlockCutted, DwtedYCrBrAMat, BLOCK_SIZE};
+use crate::{BLOCK_SIZE, Block, BlockCutted, DwtedYCrBrAMat};
 
 impl DwtedYCrBrAMat {
     /// Cut the DWT transformed matrix into blocks

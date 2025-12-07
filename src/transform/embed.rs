@@ -1,9 +1,9 @@
 use crate::{
+    Block, BlockCutted, Imbedded,
     config::{WatermarkConfig, WatermarkMode},
     quantization::{average_value, embed_quantization, extract_quantization},
     strategy::Permutation,
     transform::dct::{dct2_2d, dct3_2d},
-    Block, BlockCutted, Imbedded,
 };
 use bitvec::prelude::*;
 use itertools::Itertools;

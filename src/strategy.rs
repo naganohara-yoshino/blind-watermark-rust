@@ -1,6 +1,5 @@
-use rand::{seq::SliceRandom, SeedableRng};
+use rand::{SeedableRng, seq::SliceRandom};
 use rand_pcg::Pcg64;
-
 
 /// A permutation strategy for randomizing watermark embedding positions.
 ///
@@ -26,7 +25,6 @@ impl Permutation {
         f.shuffle(&mut rng);
         Self { f, n }
     }
-
 
     /// Calculates the position of the watermark bit corresponding to a given block.
     ///
@@ -57,7 +55,6 @@ impl Permutation {
         wmbits_position: usize,
         wm_len: usize,
     ) -> Vec<usize> {
-
         (0..self.n)
             .filter(|&i| self.f[i] % wm_len == wmbits_position)
             .collect()

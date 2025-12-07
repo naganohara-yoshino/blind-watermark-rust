@@ -11,7 +11,6 @@
 //！- **Random Strategy**: Supports randomized block selection for embedding watermarks, enhancing security.
 //！- **High-Level API**: Provides a fluent API for easy integration.
 
-
 pub mod config;
 pub mod prelude;
 pub(crate) mod quantization;
