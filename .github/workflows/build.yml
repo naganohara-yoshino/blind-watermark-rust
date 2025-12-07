@@ -75,4 +75,4 @@ jobs:
           executable-name: blind_watermark
           target: ${{ matrix.platform.target }}
           release-tag-prefix: "v"
-          changes-file: "Changes.md"
+          changes-file: "CHANGELOG.md"

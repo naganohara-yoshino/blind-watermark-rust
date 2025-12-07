@@ -12,6 +12,7 @@ documentation = "https://docs.rs/blind_watermark"
 readme = "README.md"
 keywords = ["watermark", "image", "blind-watermark", "steganography", "cli"]
 categories = ["multimedia::images", "algorithms"]
+exclude = [".github/**"]
 
 [dependencies]
 indicatif = "0.18"
