@@ -6,7 +6,7 @@ pub fn dct2_2d(mat: MatRef<f32>) -> Mat<f32> {
     assert!(mat.ncols() == mat.nrows());
     let n = mat.ncols();
     let dct_mat = dct_mat_normalized(n);
-    &dct_mat * &mat * &dct_mat.transpose()
+    &dct_mat * mat * dct_mat.transpose()
 }
 
 /// Perform 2D Type-III Discrete Cosine Transform (DCT-III), also known as IDCT
@@ -14,7 +14,7 @@ pub fn dct3_2d(mat: MatRef<f32>) -> Mat<f32> {
     assert!(mat.ncols() == mat.nrows());
     let n = mat.ncols();
     let dct_mat = dct_mat_normalized(n);
-    &dct_mat.transpose() * &mat * &dct_mat
+    dct_mat.transpose() * mat * dct_mat
 }
 
 /// Generate a normalized DCT matrix of size n x n
