@@ -26,7 +26,7 @@ rayon = "1.11"
 itertools = "0.14"
 rand = "0.10"
 rand_pcg = "0.10"
-colored = "3.0"
+colored = "3.1"
 clap = { version = "4.6", features = ["derive"] }
 ignore = "0.4"
 
