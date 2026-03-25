@@ -16,18 +16,18 @@ exclude = [".github/**"]
 
 [dependencies]
 indicatif = "0.18"
-anyhow = "1"
-faer = "0.23"
+anyhow = "1.0"
+faer = "0.24"
 image = "0.25"
 num = "0.4"
 bitvec = "1.0"
 derive_builder = "0.20"
 rayon = "1.11"
 itertools = "0.14"
-rand = "0.9"
-rand_pcg = "0.9"
+rand = "0.10"
+rand_pcg = "0.10"
 colored = "3.0"
-clap = { version = "4.5", features = ["derive"] }
+clap = { version = "4.6", features = ["derive"] }
 ignore = "0.4"
 
 [profile.dev.package.faer]
